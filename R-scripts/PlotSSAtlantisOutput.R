@@ -122,8 +122,6 @@ for (funcGroup in 1:numFuncGroups )
 }
 
 
-
-
 #-------------------------------------------------------
 #PLOT RESERVE NITROGEN OVER TIME: 
 
@@ -144,10 +142,9 @@ for (funcGroup in 1:(numCohortsAllSpp/10) )     # loop over all functional group
     par(mfrow=c(plotRowsPerPage,plotColsPerPage)) # lay out the 3x2 blank plots
     }
      
-
-
+  
 #-----------------
- # All this loop does is  find the max Y value for this rN  plot (10 age classes, one functional group)   
+ # All this loop does is find the max Y value for this rN  plot (10 age classes, one functional group)   
      maxYForPlot<-1.1  # set up a y limit max, which will change below
      for (ageclass in 1:10) # loop over all 10 age classes
      {
@@ -216,7 +213,6 @@ for (funcGroup in 1:(numCohortsAllSpp/10) )     # loop over all functional group
     par(mfrow=c(plotRowsPerPage,plotColsPerPage)) # lay out the 3x2 blank plots
     }
      
-
 
 #-----------------
  # All this loop does is  find the max Y value for this Nums  plot (10 age classes, one functional group)   
