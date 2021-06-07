@@ -1,3 +1,6 @@
+# Ignore large files in model outputs 
+SSmodel_outputs/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
