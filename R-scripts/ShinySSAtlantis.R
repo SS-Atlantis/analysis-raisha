@@ -1,4 +1,4 @@
-setwd("/ocean/rlovindeer/Atlantis/atlantis-trunk/salish-sea-atlantis-model")
+setwd("/ocean/rlovindeer/Atlantis/salish-sea-atlantis-model")
 
 library("shiny")
 library("dplyr")
