@@ -1,0 +1,36 @@
+# conda environment description for Atlantis code development
+#
+# Create a conda environment for development and execution of Atlantis
+# with:
+#
+#   $ conda env create -f environment-dev.yaml
+name: atlantis-dev
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  # Atlantis VCS
+  - subversion
+  # Atlantis build system
+  - autoconf
+  - automake
+  - c-compiler
+  - libnetcdf
+  - libxml2
+  - make
+  - pkg-config
+  - proj4
+  # R language
+  - r
+  - r-devtools
+  # R shiny web app framework for results exploration
+  - r-shiny
+  - rshiny-server-cmd
+  # Jupyter Lab for results analysis
+  - jupyterlab
+  # R kernel for Jupyter for results analysis
+  - r-irkernel
+  - r-repr
+  - r-irdisplay
+  - r-crayon
+  - r-pbdzmq
