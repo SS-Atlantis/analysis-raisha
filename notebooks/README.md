@@ -7,7 +7,13 @@ The links below are to static renderings of the notebooks via
 Descriptions below the links are from the first cell of the notebooks
 (if that cell contains Markdown or raw text).
 
-* ## [SSA_visual_calibration.ipynb](https://nbviewer.jupyter.org/github/SS-Atlantis/analysis-raisha/blob/main/notebooks/SSA_visual_calibration.ipynb)  
+* ## [SSAM-predation.ipynb](https://nbviewer.jupyter.org/github/SS-Atlantis/analysis-raisha/blob/main/notebooks/SSAM-predation.ipynb)  
+    
+* ## [SSAM-compare-runs.ipynb](https://nbviewer.jupyter.org/github/SS-Atlantis/analysis-raisha/blob/main/notebooks/SSAM-compare-runs.ipynb)  
+    
+* ## [SSAM-growth-pp.ipynb](https://nbviewer.jupyter.org/github/SS-Atlantis/analysis-raisha/blob/main/notebooks/SSAM-growth-pp.ipynb)  
+    
+* ## [SSAM-food-web.ipynb](https://nbviewer.jupyter.org/github/SS-Atlantis/analysis-raisha/blob/main/notebooks/SSAM-food-web.ipynb)  
     
 
 ## License
