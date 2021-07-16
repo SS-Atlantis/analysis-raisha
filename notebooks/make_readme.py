@@ -1,4 +1,5 @@
-# Copyright by the UBC EOAS MOAD Group and The University of British Columbia.
+# Copyright by the Salish Sea Atlantis project contributors,
+# The University of British Columbia, and CSIRO.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -56,9 +57,8 @@ Descriptions below the links are from the first cell of the notebooks
     license = f"""
 ## License
 
-These notebooks and files are copyright by the
-[UBC EOAS MOAD Group](https://github.com/UBC-MOAD/docs/blob/main/CONTRIBUTORS.rst)
-and The University of British Columbia.
+These notebooks and files are copyright by the Salish Sea Atlantis project contributors,
+The University of British Columbia, and CSIRO.
 
 They are licensed under the Apache License, Version 2.0.
 http://www.apache.org/licenses/LICENSE-2.0
