@@ -4,6 +4,12 @@
 # with:
 #
 #   $ conda env create -f environment-dev.yaml
+#
+# To add new packages to the environment,
+# add them to the dependencies list below,
+# then update the activated environment with:
+#
+#   $ conda env update -f environment-dev.yaml
 name: atlantis-dev
 channels:
   - conda-forge
@@ -34,3 +40,23 @@ dependencies:
   - r-irdisplay
   - r-crayon
   - r-pbdzmq
+  # For running spills in ocean parcels
+  - arrow
+  - bottleneck
+  - cmocean
+  - python-dateutil
+  - matplotlib
+  - netCDF4
+  - numpy
+  - pandas
+  - parcels
+  - pip
+  - python=3
+  - pytz
+  - scipy
+  - xarray
+  - ffmpeg
+  - geopandas
+  # Salish Sea Plotting Tools
+  - IPython
+  - cartopy
