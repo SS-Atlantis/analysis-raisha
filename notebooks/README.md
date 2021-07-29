@@ -15,13 +15,15 @@ Descriptions below the links are from the first cell of the notebooks
     
 * ## [SSAM-food-web.ipynb](https://nbviewer.jupyter.org/github/SS-Atlantis/analysis-raisha/blob/main/notebooks/SSAM-food-web.ipynb)  
     
+* ## [SSAM-parcels.ipynb](https://nbviewer.jupyter.org/github/SS-Atlantis/analysis-raisha/blob/main/notebooks/SSAM-parcels.ipynb)  
+    
+* ## [SSAM-parse-tracks.ipynb](https://nbviewer.jupyter.org/github/SS-Atlantis/analysis-raisha/blob/main/notebooks/SSAM-parse-tracks.ipynb)  
+    
 
 ## License
 
-These notebooks and files are copyright by the
-Salish Sea Atlantis project contributors,
-The University of British Columbia,
-and CSIRO.
+These notebooks and files are copyright by the Salish Sea Atlantis project contributors,
+The University of British Columbia, and CSIRO.
 
 They are licensed under the Apache License, Version 2.0.
 http://www.apache.org/licenses/LICENSE-2.0
