@@ -1,0 +1,39 @@
+# conda environment description for Atlantis Ocean Parcels code development
+#
+# Create a conda environment for development and execution of Atlantis Ocean Parcels Tools
+# with:
+#
+#   $ conda env create -f OPenvironment-dev.yaml
+#
+# To add new packages to the environment,
+# add them to the dependencies list below,
+# then update the activated environment with:
+#
+#   $ conda env update -f OPenvironment-dev.yaml
+name: parcels-dev
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  # Jupyter Lab for results analysis
+  - jupyterlab
+   # For running spills in ocean parcels
+  - arrow
+  - bottleneck
+  - cmocean
+  - python-dateutil
+  - matplotlib
+  - netCDF4
+  - numpy
+  - pandas
+  - parcels
+  - pip
+  - python=3
+  - pytz
+  - scipy
+  - xarray
+  - ffmpeg
+  - geopandas
+  # Salish Sea Plotting Tools
+  - IPython
+  - cartopy
