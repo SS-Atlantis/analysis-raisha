@@ -3,13 +3,13 @@
 # Create a conda environment for development and execution of Atlantis
 # with:
 #
-#   $ conda env create -f environment-dev.yaml
+#   $ conda env create -f atlantis-dev.yaml
 #
 # To add new packages to the environment,
 # add them to the dependencies list below,
 # then update the activated environment with:
 #
-#   $ conda env update -f environment-dev.yaml
+#   $ conda env update -f atlantis-dev.yaml
 name: atlantis-dev
 channels:
   - conda-forge
