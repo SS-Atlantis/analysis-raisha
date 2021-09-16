@@ -11,6 +11,9 @@ Descriptions below the links are from the first cell of the notebooks
     
 * ## [SSAM-compare-runs.ipynb](https://nbviewer.jupyter.org/github/SS-Atlantis/analysis-raisha/blob/main/atlantis-visualization/SSAM-compare-runs.ipynb)  
     
+    Code scripts in R for comparing Salish Sea Atlantis runs and exploring input hydrodyanamics files using the [ReactiveAtlantis](https://github.com/Atlantis-Ecosystem-Model/ReactiveAtlantis) and [shinyrAtlantis](https://github.com/Atlantis-Ecosystem-Model/shinyrAtlantis) libraries. 
+    Output for each set of scripts are displayed in a shiny app web browser.
+
 * ## [SSAM-growth-pp.ipynb](https://nbviewer.jupyter.org/github/SS-Atlantis/analysis-raisha/blob/main/atlantis-visualization/SSAM-growth-pp.ipynb)  
     
 * ## [SSAM-food-web.ipynb](https://nbviewer.jupyter.org/github/SS-Atlantis/analysis-raisha/blob/main/atlantis-visualization/SSAM-food-web.ipynb)  
