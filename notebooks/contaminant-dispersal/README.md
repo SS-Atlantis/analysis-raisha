@@ -19,8 +19,15 @@ Descriptions below the links are from the first cell of the notebooks
 
 * ## [SSAM-parcels.ipynb](https://nbviewer.jupyter.org/github/SS-Atlantis/analysis-raisha/blob/main/contaminant-dispersal/SSAM-parcels.ipynb)  
     
+    Using [Ocean Parcels](https://oceanparcels.org) to track the surface movement of contaminants. 
+    Original code written by Bec Gordon & Javier Porobic, CSIRO, and code requires additional python libraries stored in /Parcel_Utils/ within the [SSAM Ocean Parcels Repo](https://bitbucket.csiro.au/users/por07g/repos/ssam_oceanparcels/browse)
+
 * ## [SSAM-parse-tracks.ipynb](https://nbviewer.jupyter.org/github/SS-Atlantis/analysis-raisha/blob/main/contaminant-dispersal/SSAM-parse-tracks.ipynb)  
     
+    Mapping particle tracks from Ocean Parcels unto the Salish Sea Atlantis Boxes. 
+    Original code written by Bec Gordon & Javier Porobic, CSIRO.
+    Link to the [SSAM Ocean Parcels Repo](https://bitbucket.csiro.au/users/por07g/repos/ssam_oceanparcels/browse)
+
 
 ## License
 
