@@ -7,17 +7,18 @@ The links below are to static renderings of the notebooks via
 Descriptions below the links are from the first cell of the notebooks
 (if that cell contains Markdown or raw text).
 
-* ## [SSAM-predation.ipynb](https://nbviewer.jupyter.org/github/SS-Atlantis/analysis-raisha/blob/main/atlantis-visualization/SSAM-predation.ipynb)  
-    
 * ## [SSAM-compare-runs.ipynb](https://nbviewer.jupyter.org/github/SS-Atlantis/analysis-raisha/blob/main/atlantis-visualization/SSAM-compare-runs.ipynb)  
     
-    Code scripts in R for comparing Salish Sea Atlantis runs and exploring input hydrodyanamics files using the [ReactiveAtlantis](https://github.com/Atlantis-Ecosystem-Model/ReactiveAtlantis) and [shinyrAtlantis](https://github.com/Atlantis-Ecosystem-Model/shinyrAtlantis) libraries. 
-    Output for each set of scripts are displayed in a shiny app web browser.
+    Code scripts in R for comparing output of the Salish Sea Atlantis Model simulations using the [ReactiveAtlantis](https://github.com/Atlantis-Ecosystem-Model/ReactiveAtlantis) library. Output is displayed in a shiny app web browser.
 
-* ## [SSAM-growth-pp.ipynb](https://nbviewer.jupyter.org/github/SS-Atlantis/analysis-raisha/blob/main/atlantis-visualization/SSAM-growth-pp.ipynb)  
-    
 * ## [SSAM-food-web.ipynb](https://nbviewer.jupyter.org/github/SS-Atlantis/analysis-raisha/blob/main/atlantis-visualization/SSAM-food-web.ipynb)  
     
+    Code scripts in R for examining food web dynamics (including predation, recruitment, and growth of primary producers) from an output file of a Salish Sea Atlantis Model simulation using the [ReactiveAtlantis](https://github.com/Atlantis-Ecosystem-Model/ReactiveAtlantis) library. Output for each cell is displayed in a new shiny app web browser.
+
+* ## [SSAM-hydrodynamics.ipynb](https://nbviewer.jupyter.org/github/SS-Atlantis/analysis-raisha/blob/main/atlantis-visualization/SSAM-hydrodynamics.ipynb)  
+    
+    Code scripts in R for exploring hydrodynamic forcing files (vertical transport, salinity and temperature) required for forcing the Salish Sea Atlantis Model. Code uses the [shinyrAtlantis](https://github.com/Atlantis-Ecosystem-Model/shinyrAtlantis) library. Output for each cell is displayed in a shiny app web browser.
+
 
 ## License
 
