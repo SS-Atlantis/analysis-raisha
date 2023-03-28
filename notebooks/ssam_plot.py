@@ -1,8 +1,8 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-from ssam_groups.py import cohorts
-from ssam_groups.py import bacteria
+from ssam_groups import cohorts
+from ssam_groups import bacteria
 
 label_size = 11
 font_size = 12
