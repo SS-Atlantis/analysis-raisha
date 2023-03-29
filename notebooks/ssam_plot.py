@@ -296,12 +296,10 @@ def plot_cohorts(group, scenario, control, time, start, end, event_start):
 
 def plot_pelagic_biomass(group, scenario, control, time, start, end, event_start):
 
+    fig = plt.figure(figsize=(18, 14), facecolor='white')
+    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1]) 
+
     for species in group:
-        fig, ax = plt.subplots(figsize = (14,3))
-        ax.tick_params(labelsize=label_size)
-        ax.set_ylabel('mg N$^{-3}$') 
-        ax.set_title('Pelagic Biomass of ' + str(group[species]) + ' in Salish Sea Atlantis', fontsize = font_size)
-        #ax.set_ylim([y_min, y_max])
         
         pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,:,0:5], np.nan) # tonnes
         pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,:,0:5], np.nan)
@@ -311,41 +309,68 @@ def plot_pelagic_biomass(group, scenario, control, time, start, end, event_start
         p_control = p_control.sum(axis=1)
         p_max = p_oiled.max()
         p_min = p_oiled.min()
+
+        bio_index = (list(group).index(species))
+
+        if bio_index < 3:
+            position = 0, bio_index
+        elif bio_index > 5: 
+            position = 2, bio_index-6
+        else :
+            position = 1, bio_index-3
+
+        ax = fig.add_subplot(gs[position])
+        ax.tick_params(labelsize=label_size)
+        ax.set_ylabel('mg N$^{-3}$') 
+        ax.set_title(str(group[species]), fontsize = font_size)
+        #ax.set_ylim([y_min, y_max])
         ax.plot(time, p_oiled, label='scenario', linewidth = 2)
-        ax.plot(time, p_control, 'k', label='control',linewidth = 2)
-        ax.plot([event_start,event_start],[p_min, p_max], 'r', alpha=0.5)
-        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12)  # to place the legend outside
+        ax.plot(time, p_control, 'k', label='control',linewidth = 1)
+        ax.plot([event_start,event_start],[p_min, p_max], 'r', label='event start', alpha=0.5)
+        #ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12)  # to place the legend outside
+    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);
 
 def plot_benthic_biomass(group, scenario, control, time, start, end, event_start): 
 
+    fig = plt.figure(figsize=(18, 14), facecolor='white')
+    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1]) 
+
     for species in group:
-        fig, ax = plt.subplots(figsize = (14,3))
-        ax.tick_params(labelsize=label_size)
-        ax.set_ylabel('mg N$^{-3}$')
-        ax.set_title('Benthic Biomass of ' + str(group[species]) + ' in Salish Sea Atlantis', fontsize = font_size)
-        #ax.set_ylim([y_min, y_max])
-        
+
         pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,:], np.nan) # tonnes
         pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,:], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         p_max = p_oiled.max()
         p_min = p_oiled.min()
+
+        bio_index = (list(group).index(species))
+
+        if bio_index < 3:
+            position = 0, bio_index
+        elif bio_index > 5: 
+            position = 2, bio_index-6
+        else :
+            position = 1, bio_index-3
+
+        ax = fig.add_subplot(gs[position])
+        ax.tick_params(labelsize=label_size)
+        ax.set_ylabel('mg N$^{-3}$')
+        ax.set_title(str(group[species]), fontsize = font_size)
+        #ax.set_ylim([y_min, y_max])
         ax.plot(time, p_oiled, linewidth = 2)
-        ax.plot(time, p_control, 'k',linewidth = 2)
+        ax.plot(time, p_control, 'k',linewidth = 1)
         ax.plot([event_start,event_start],[p_min, p_max], 'r', alpha=0.5)
+    ax.legend(['scenario', 'control', 'event start'], bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);
 
 def plot_bacteria_biomass(scenario, control, time, start, end, event_start): 
 
     group = bacteria
+    fig = plt.figure(figsize=(18, 14), facecolor='white')
+    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1]) 
 
     for species in bacteria:
-        fig, ax = plt.subplots(figsize = (14,3))
-        ax.tick_params(labelsize=label_size)
-        ax.set_ylabel('mg N$^{-3}$')
-        ax.set_title('Biomass of ' + str(group[species]) + ' in Salish Sea Atlantis', fontsize = font_size)
-        #ax.set_ylim([y_min, y_max])
-
+    
         if "pelagic" in species:
             bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,:,0:5], np.nan) # tonnes, take only water column layers
             bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,:,0:5], np.nan)
@@ -361,40 +386,67 @@ def plot_bacteria_biomass(scenario, control, time, start, end, event_start):
         
         p_max = b_oiled.max()
         p_min = b_oiled.min()
-        ax.plot(time, b_oiled, linewidth = 2)
-        ax.plot(time, b_control, 'k',linewidth = 2)
-        ax.plot([event_start,event_start],[p_min, p_max], 'r', alpha=0.5)
 
-def plot_surface_biomass(group, scenario, control, time, start, end, event_start): # benthos, shellfish
+        bio_index = (list(group).index(species))
 
-    for species in group:
-        fig, ax = plt.subplots(figsize = (14,3))
+        if bio_index < 3:
+            position = 0, bio_index
+        elif bio_index > 5: 
+            position = 2, bio_index-6
+        else :
+            position = 1, bio_index-3
+
+        ax = fig.add_subplot(gs[position])
         ax.tick_params(labelsize=label_size)
         ax.set_ylabel('mg N$^{-3}$')
-        ax.set_title('Surface Biomass of ' + str(group[species]) + ' in Salish Sea Atlantis', fontsize = font_size)
+        ax.set_title(str(group[species]), fontsize = font_size)
         #ax.set_ylim([y_min, y_max])
+        ax.plot(time, b_oiled, linewidth = 2)
+        ax.plot(time, b_control, 'k',linewidth = 1)
+        ax.plot([event_start,event_start],[p_min, p_max], 'r', alpha=0.5)
+    ax.legend(['scenario', 'control', 'event start'], bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);        
 
+def plot_surface_biomass(group, scenario, control, time, start, end, event_start): # benthos, shellfish
+    
+    fig = plt.figure(figsize=(18, 14), facecolor='white')
+    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
+
+    for species in group:
+       
         pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,:,4:5], np.nan) # tonnes
         pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,:,4:5], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
-        p_oiled = pelagic_oiled.sum(axis=1)
-        p_control = pelagic_control.sum(axis=1)
+        p_oiled = p_oiled.sum(axis=1)
+        p_control = p_control.sum(axis=1)
         p_max = p_oiled.max()
         p_min = p_oiled.min()
+
+        bio_index = (list(group).index(species))
+
+        if bio_index < 3:
+            position = 0, bio_index
+        elif bio_index > 5: 
+            position = 2, bio_index-6
+        else :
+            position = 1, bio_index-3
+
+        ax = fig.add_subplot(gs[position])
+        ax.tick_params(labelsize=label_size)
+        ax.set_ylabel('mg N$^{-3}$')
+        ax.set_title(str(group[species]), fontsize = font_size)
+        #ax.set_ylim([y_min, y_max])
         ax.plot(time, p_oiled, linewidth = 2)
-        ax.plot(time, p_control, 'k',linewidth = 2)
+        ax.plot(time, p_control, 'k',linewidth = 1)
         ax.plot([event_start,event_start],[p_min, p_max], 'r', alpha=0.5)
-        #ax.plot([spill_end, spill_end], [y_min, y_max], 'r',alpha=0.1)
+    ax.legend(['scenario', 'control', 'event start'], bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);
 
 def plot_sediment_biomass(group, scenario, control, time, start, end, event_start): 
 
+    fig = plt.figure(figsize=(18, 14), facecolor='white')
+    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
+
     for species in group:
-        fig, ax = plt.subplots(figsize = (14,3))
-        ax.tick_params(labelsize=label_size)
-        ax.set_ylabel('mg N$^{-3}$')
-        ax.set_title('Sediment Biomass of ' + str(group[species]) + ' in Salish Sea Atlantis', fontsize = font_size)
-        #ax.set_ylim([y_min, y_max])
         
         pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,:,6], np.nan) # tonnes
         pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,:,6], np.nan)
@@ -402,18 +454,32 @@ def plot_sediment_biomass(group, scenario, control, time, start, end, event_star
         p_control = pelagic_control.sum(axis=1)
         p_max = p_oiled.max()
         p_min = p_oiled.min()
+
+        bio_index = (list(group).index(species))
+
+        if bio_index < 3:
+            position = 0, bio_index
+        elif bio_index > 5: 
+            position = 2, bio_index-6
+        else :
+            position = 1, bio_index-3
+
+        ax = fig.add_subplot(gs[position])
+        ax.tick_params(labelsize=label_size)
+        ax.set_ylabel('mg N$^{-3}$')
+        ax.set_title(str(group[species]), fontsize = font_size)
+        #ax.set_ylim([y_min, y_max])
         ax.plot(time, p_oiled, linewidth = 2)
-        ax.plot(time, p_control, 'k',linewidth = 2)
+        ax.plot(time, p_control, 'k',linewidth = 1)
         ax.plot([event_start,event_start],[p_min, p_max], 'r', alpha=0.5)
+    ax.legend(['scenario', 'control', 'event start'], bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);
 
 def plot_pelagic_biomass_box(group, scenario, box_number, control, time, start, end, event_start):
 
+    fig = plt.figure(figsize=(18, 14), facecolor='white')
+    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
+
     for species in group:
-        fig, ax = plt.subplots(figsize = (14,3))
-        ax.tick_params(labelsize=label_size)
-        ax.set_ylabel('mg N$^{-3}$') 
-        ax.set_title('Pelagic Biomass of ' + str(group[species]) + ' in Salish Sea Atlantis box ' + str(box_number), fontsize = font_size)
-        #ax.set_ylim([y_min, y_max])
         
         pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,box_number,0:5], np.nan) # tonnes
         pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,box_number,0:5], np.nan)
@@ -421,18 +487,32 @@ def plot_pelagic_biomass_box(group, scenario, box_number, control, time, start, 
         p_control = pelagic_control.sum(axis=1)
         p_max = p_oiled.max()
         p_min = p_oiled.min()
+
+        bio_index = (list(group).index(species))
+
+        if bio_index < 3:
+            position = 0, bio_index
+        elif bio_index > 5: 
+            position = 2, bio_index-6
+        else :
+            position = 1, bio_index-3
+
+        ax = fig.add_subplot(gs[position])
+        ax.tick_params(labelsize=label_size)
+        ax.set_ylabel('mg N$^{-3}$') 
+        ax.set_title(str(group[species]) + ' in Atlantis box ' + str(box_number), fontsize = font_size)
+        #ax.set_ylim([y_min, y_max])
         ax.plot(time, p_oiled, linewidth = 2)
-        ax.plot(time, p_control, 'k',linewidth = 2)
+        ax.plot(time, p_control, 'k',linewidth = 1)
         ax.plot([event_start,event_start],[p_min, p_max], 'r', alpha=0.5)
+    ax.legend(['scenario', 'control', 'event start'], bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);
 
 def plot_benthic_biomass_box(group, scenario, box_number, control, time, start, end, event_start): 
-
+    
+    fig = plt.figure(figsize=(18, 14), facecolor='white')
+    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
+   
     for species in group:
-        fig, ax = plt.subplots(figsize = (14,3))
-        ax.tick_params(labelsize=label_size)
-        ax.set_ylabel('mg N$^{-3}$')
-        ax.set_title('Benthic Biomass of ' + str(group[species]) + ' in Salish Sea Atlantis box ' + str(box_number), fontsize = font_size)
-        #ax.set_ylim([y_min, y_max])
         
         pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,box_number], np.nan) # tonnes
         pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,box_number], np.nan)
@@ -440,21 +520,34 @@ def plot_benthic_biomass_box(group, scenario, box_number, control, time, start, 
         p_control = pelagic_control
         p_max = p_oiled.max()
         p_min = p_oiled.min()
+
+        bio_index = (list(group).index(species))
+
+        if bio_index < 3:
+            position = 0, bio_index
+        elif bio_index > 5: 
+            position = 2, bio_index-6
+        else :
+            position = 1, bio_index-3
+
+        ax = fig.add_subplot(gs[position])
+        ax.tick_params(labelsize=label_size)
+        ax.set_ylabel('mg N$^{-3}$')
+        ax.set_title(str(group[species]) + ' in Atlantis box ' + str(box_number), fontsize = font_size)
+        #ax.set_ylim([y_min, y_max])
         ax.plot(time, p_oiled, linewidth = 2)
-        ax.plot(time, p_control, 'k',linewidth = 2)
+        ax.plot(time, p_control, 'k',linewidth = 1)
         ax.plot([event_start,event_start],[p_min, p_max], 'r', alpha=0.5)
+    ax.legend(['scenario', 'control', 'event start'], bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);
 
 def plot_bacteria_biomass_box(scenario, box_number, control, time, start, end, event_start): 
 
     group = bacteria
+    fig = plt.figure(figsize=(18, 14), facecolor='white')
+    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
 
     for species in bacteria:
-        fig, ax = plt.subplots(figsize = (14,3))
-        ax.tick_params(labelsize=label_size)
-        ax.set_ylabel('mg N$^{-3}$')
-        ax.set_title('Biomass of ' + str(group[species]) + ' in Salish Sea Atlantis box ' + str(box_number), fontsize = font_size)
-        #ax.set_ylim([y_min, y_max])
-
+        
         if "pelagic" in species:
             bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,box_number,0:5], np.nan) # tonnes, take only water column layers
             bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,box_number,0:5], np.nan)
@@ -466,38 +559,65 @@ def plot_bacteria_biomass_box(scenario, box_number, control, time, start, end, e
         
         p_max = b_oiled.max()
         p_min = b_oiled.min()
-        ax.plot(time, b_oiled, linewidth = 2)
-        ax.plot(time, b_control, 'k',linewidth = 2)
-        ax.plot([event_start,event_start],[p_min, p_max], 'r', alpha=0.5)
+        
+        bio_index = (list(group).index(species))
 
-def plot_surface_biomass_box(group, scenario, box_number, control, time, start, end, event_start): # benthos, shellfish
+        if bio_index < 3:
+            position = 0, bio_index
+        elif bio_index > 5: 
+            position = 2, bio_index-6
+        else :
+            position = 1, bio_index-3
 
-    for species in group:
-        fig, ax = plt.subplots(figsize = (14,3))
+        ax = fig.add_subplot(gs[position])
         ax.tick_params(labelsize=label_size)
         ax.set_ylabel('mg N$^{-3}$')
-        ax.set_title('Surface Biomass of ' + str(group[species]) + ' in Salish Sea Atlantis box ' + str(box_number), fontsize = font_size)
+        ax.set_title(str(group[species]) + ' in Atlantis box ' + str(box_number), fontsize = font_size)
         #ax.set_ylim([y_min, y_max])
+        ax.plot(time, b_oiled, linewidth = 2)
+        ax.plot(time, b_control, 'k',linewidth = 1)
+        ax.plot([event_start,event_start],[p_min, p_max], 'r', alpha=0.5)
+    ax.legend(['scenario', 'control', 'event start'], bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);
 
+def plot_surface_biomass_box(group, scenario, box_number, control, time, start, end, event_start): 
+
+    fig = plt.figure(figsize=(18, 14), facecolor='white')
+    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
+
+    for species in group:
+        
         pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,box_number,4:5], np.nan) # tonnes
         pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,box_number,4:5], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         p_max = p_oiled.max()
         p_min = p_oiled.min()
+
+        bio_index = (list(group).index(species))
+
+        if bio_index < 3:
+            position = 0, bio_index
+        elif bio_index > 5: 
+            position = 2, bio_index-6
+        else :
+            position = 1, bio_index-3
+
+        ax = fig.add_subplot(gs[position])
+        ax.tick_params(labelsize=label_size)
+        ax.set_ylabel('mg N$^{-3}$')
+        ax.set_title('Surface Biomass of ' + str(group[species]) + ' in Salish Sea Atlantis box ' + str(box_number), fontsize = font_size)
+        #ax.set_ylim([y_min, y_max])
         ax.plot(time, p_oiled, linewidth = 2)
-        ax.plot(time, p_control, 'k',linewidth = 2)
+        ax.plot(time, p_control, 'k',linewidth = 1)
         ax.plot([event_start,event_start],[p_min, p_max], 'r', alpha=0.5)
-        #ax.plot([spill_end, spill_end], [y_min, y_max], 'r',alpha=0.1)
+    ax.legend(['scenario', 'control', 'event start'], bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);
 
 def plot_sediment_biomass_box(group, scenario, box_number, control, time, start, end, event_start): 
 
+    fig = plt.figure(figsize=(18, 14), facecolor='white')
+    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
+
     for species in group:
-        fig, ax = plt.subplots(figsize = (14,3))
-        ax.tick_params(labelsize=label_size)
-        ax.set_ylabel('mg N$^{-3}$')
-        ax.set_title('Sediment Biomass of ' + str(group[species]) + ' in Salish Sea Atlantis box ' + str(box_number), fontsize = font_size)
-        #ax.set_ylim([y_min, y_max])
         
         pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,box_number,6], np.nan) # tonnes
         pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,box_number,6], np.nan)
@@ -505,9 +625,25 @@ def plot_sediment_biomass_box(group, scenario, box_number, control, time, start,
         p_control = pelagic_control
         p_max = p_oiled.max()
         p_min = p_oiled.min()
+        
+        bio_index = (list(group).index(species))
+
+        if bio_index < 3:
+            position = 0, bio_index
+        elif bio_index > 5: 
+            position = 2, bio_index-6
+        else :
+            position = 1, bio_index-3
+
+        ax = fig.add_subplot(gs[position])
+        ax.tick_params(labelsize=label_size)
+        ax.set_ylabel('mg N$^{-3}$')
+        ax.set_title(str(group[species]) + ' in Atlantis box ' + str(box_number), fontsize = font_size)
+        #ax.set_ylim([y_min, y_max])
         ax.plot(time, p_oiled, linewidth = 2)
-        ax.plot(time, p_control, 'k',linewidth = 2)
+        ax.plot(time, p_control, 'k',linewidth = 1)
         ax.plot([event_start,event_start],[p_min, p_max], 'r', alpha=0.5)
+    ax.legend(['scenario', 'control', 'event start'], bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);
 
 def plot_pelagic_diff_box(group, scenario, box_number, control, time, start, end, event_start):
 
@@ -936,3 +1072,38 @@ def pelagic_compare_scenarios(group, scenario1, scenario2, scenario3, control, t
         ax.legend(['control', 'scenario 1', 'scenario 2', 'scenario 3'])
         ax.set_title(species)
         #ax.set_ylim([y_min, y_max])
+
+def sediment_compare_scenarios(group, scenario1, scenario2, scenario3, control, time, start, end): # benthos, shellfish
+
+    # Plot variables
+    #y_min = 0.8
+    #y_max = 1.2
+    fig = plt.figure(figsize=(18, 18), facecolor='white')
+    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
+
+    for species in group:
+        benthic_oiled1 = np.ma.filled(scenario1.variables[group[species] + '_N'][start:end,:,6], np.nan) # tonnes
+        benthic_oiled2 = np.ma.filled(scenario2.variables[group[species] + '_N'][start:end,:,6], np.nan) # tonnes
+        benthic_oiled3 = np.ma.filled(scenario3.variables[group[species] + '_N'][start:end,:,6], np.nan) # tonnes
+        benthic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,:,6], np.nan)
+        ratio1 = (benthic_oiled1.sum(axis=1) / benthic_control.sum(axis=1)-1)*100 
+        ratio2 = (benthic_oiled2.sum(axis=1) / benthic_control.sum(axis=1)-1)*100 
+        ratio3 = (benthic_oiled3.sum(axis=1) / benthic_control.sum(axis=1)-1)*100 
+        control_ratio = (benthic_control.sum(axis=1)  / benthic_control.sum(axis=1)-1)*100
+        
+        bio_index = (list(group).index(species))
+
+        if bio_index < 3:
+            position = 0, bio_index
+        elif bio_index > 5: 
+            position = 2, bio_index-6
+        else :
+            position = 1, bio_index-3
+
+        ax = fig.add_subplot(gs[position])
+        
+        ax.plot(time, control_ratio, 'k', time, ratio1, time, ratio2, time, ratio3, linewidth = 2)
+        #ax.set_ylim([y_min, y_max])
+        plt.ylabel('Percent (%) change', fontsize=12)
+        ax.legend(['control', 'scenario 1', 'scenario 2', 'scenario 3'])
+        ax.set_title(species);

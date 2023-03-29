@@ -49,7 +49,7 @@ macroalgae = { #benthic, 1 depth
 }
 
 sediment_feeders = { #pelagic, i.e. have > 1 depth level but only exist in the sediment
-    'benthic carnivores':'Benthic_Carniv', 'deposit feeders':'Deposit_Feeder', 'meiobenthos':'Meiobenth',
+    'benthic carnivores':'Benthic_Carniv', 'deposit feeders':'Deposit_Feeder', 'meiobenthos':'Meiobenth', 'sedimentary bacteria': 'Sed_Bact',
 }
     
 shellfish = { #benthic, 1 depth
@@ -58,7 +58,7 @@ shellfish = { #benthic, 1 depth
 
 plankton = {
     'carnivorous zooplankton':'Carniv_Zoo', 'gelatinous zooplantkon':'Gelat_Zoo', 'microzooplankton':'MicroZoo',
-    'mesozooplankton':'Zoo', 'diatoms':'Diatom', 'picophytoplankton':'PicoPhytopl',
+    'mesozooplankton':'Zoo', 'diatoms':'Diatom', 'picophytoplankton':'PicoPhytopl', 'pelagic bacteria':'Pelag_Bact',
 }
 
 pelagic_invertebrates = {
