@@ -88,3 +88,7 @@ benthos = { # all benthic groups with only 1 depth
     'sponges':'Sponges', 'bivalves':'Bivalves', 'crabs':'Crabs', 'dungeness crabs':'Dungeness_crabs',
     'macroalgae':'Macroalgae', 'seagrass':'Seagrass', 
 }
+
+primaryproducer = {
+   'diatoms':'Diatom', 'picophytoplankton':'PicoPhytopl', 'macroalgae':'Macroalgae', 'seagrass':'Seagrass',
+}
