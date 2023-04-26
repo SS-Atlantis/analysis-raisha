@@ -92,3 +92,21 @@ benthos = { # all benthic groups with only 1 depth
 primaryproducer = {
    'diatoms':'Diatom', 'picophytoplankton':'PicoPhytopl', 'macroalgae':'Macroalgae', 'seagrass':'Seagrass',
 }
+
+all_pelagic = {
+    'dogfish':'Dogfish','ratfish':'Ratfish', 'sixgill':'Sixgill', 'skates':'Skates',
+    'seagulls':'Seabird_gulls', 'other seabirds':'Seabirds',
+    'porpoises':'Harbor_porpoise', 'seals':'Harbor_seals', 'humpbacks':'Humpback_whales','sealions':'Sealions',
+    'resident orcas':'Orcas_resident', 'transient orcas':'Orcas_transient',
+    'benthopelagic':'Benthopelagic', 'small pelagic':'Small_pelagic_fish', 'small demersal':'Small_Demersal_fish', 
+    'large demersal':'Large_Demersal_fish', 'small flatfish':'Small_Flatfish', 'large flatfish':'Large_Flatfish',
+    'hake':'Hake','lingcod':'Lingcod', 'pollock':'Pollock', 'sandlance':'Sandlance', 
+    'rockfish':'Rockfish', 'pacific herring':'Pacific_herring',
+    'Chinook':'Chinook_salmon', 'Chum':'Chum_salmon', 'Coho':'Coho_salmon','Pink':'Pink_salmon', 'Sockeye':'Sockeye_salmon', 
+    'Hatchery Chinook':'Hatchery_Chinook_salmon','Hatchery Coho':'Hatchery_Coho_salmon','Hatchery Sockeye':'Hatchery_Sockeye_salmon', 
+    'Other salmonids':'Other_salmonids',
+    'benthic carnivores':'Benthic_Carniv', 'deposit feeders':'Deposit_Feeder', 'meiobenthos':'Meiobenth', 'sedimentary bacteria': 'Sed_Bact',
+    'carnivorous zooplankton':'Carniv_Zoo', 'gelatinous zooplantkon':'Gelat_Zoo', 'microzooplankton':'MicroZoo',
+    'mesozooplankton':'Zoo', 'diatoms':'Diatom', 'picophytoplankton':'PicoPhytopl', 'pelagic bacteria':'Pelag_Bact', 
+    'squid':'Squid', 'prawn': 'Prawn', 
+}
