@@ -110,3 +110,8 @@ all_pelagic = {
     'mesozooplankton':'Zoo', 'diatoms':'Diatom', 'picophytoplankton':'PicoPhytopl', 'pelagic bacteria':'Pelag_Bact', 
     'squid':'Squid', 'prawn': 'Prawn', 
 }
+
+nutrients = {
+    'ammonia':'NH3', 'nitrate':'NO3', 'dissolved organic nitrogen':'DON', 'micronutrients': 'MicroNut', 
+    'dissolved silica':'Si', 'detrital silica':'Det_Si',
+}
