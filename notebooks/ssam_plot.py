@@ -2,6 +2,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import geopandas as gpd
 import matplotlib.cm as cm
 from ssam_groups import cohorts
 from ssam_groups import bacteria
@@ -41,8 +42,8 @@ def plot_pelagic(group, scenario, control, time, start, end, event_start, y_min=
     ax.set_title('Change relative to control of pelagic groups in Salish Sea Atlantis', fontsize = font_size)
  
     for species in group:
-        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,:,0:5], np.nan) # tonnes, take only water column layers
-        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,:,0:5], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,:,0:6], np.nan) # tonnes, take only water column layers
+        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,:,0:6], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         ratio = p_oiled.sum(axis=1) / p_control.sum(axis=1) 
@@ -63,8 +64,8 @@ def plot_surface(group, scenario, control, time, start, end, event_start, y_min=
     ax.set_title('Change relative to control of groups in the surface of Salish Sea Atlantis', fontsize = font_size)
 
     for species in group:
-        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,:,4:5], np.nan) # tonnes, take only water column layers
-        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,:,4:5], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,:,4:6], np.nan) # tonnes, take only water column layers
+        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,:,4:6], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         ratio = p_oiled.sum(axis=1) / p_control.sum(axis=1) 
@@ -86,8 +87,8 @@ def plot_bacteria(scenario, control, time, start, end, event_start, y_min=None, 
 
     for species in bacteria:
         if "pelagic" in species:
-            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,:,0:5], np.nan) # tonnes, take only water column layers
-            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,:,0:5,], np.nan)
+            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,:,0:6], np.nan) # tonnes, take only water column layers
+            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,:,0:6,], np.nan)
             b_oiled = bact_oiled.sum(axis=2)
             b_control = bact_control.sum(axis=2)
         else:
@@ -155,8 +156,8 @@ def plot_bacteria_box(scenario, box_number, control, time, start, end, event_sta
 
     for species in bacteria:
         if "pelagic" in species:
-            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,box_number,0:5], np.nan) # tonnes, take only water column layers
-            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,box_number,0:5], np.nan)
+            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,box_number,0:6], np.nan) # tonnes, take only water column layers
+            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,box_number,0:6], np.nan)
             b_oiled = bact_oiled.sum(axis=1)
             b_control = bact_control.sum(axis=1)
         else:
@@ -181,8 +182,8 @@ def plot_pelagic_box(group, scenario, box_number, control, time, start, end, eve
     ax.set_title('Change in pelagic groups relative to control in Salish Sea Atlantis box ' + str(box_number), fontsize = font_size)
 
     for species in group:
-        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,box_number,0:5], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,box_number,0:5], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,box_number,0:6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,box_number,0:6], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         ratio = p_oiled / p_control
@@ -203,8 +204,8 @@ def plot_surface_box(group, scenario, box_number, control, time, start, end, eve
     ax.set_title('Change in surface groups relative to control in Salish Sea Atlantis box ' + str(box_number), fontsize = font_size)
 
     for species in group:
-        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,box_number,4:5], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,box_number,4:5], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,box_number,4:6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,box_number,4:6], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         ratio = p_oiled / p_control
@@ -301,8 +302,8 @@ def plot_pelagic_biomass(group, scenario, control, time, start, end, event_start
 
     for species in group:
         
-        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,:,0:5], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,:,0:5], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,:,0:6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,:,0:6], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         p_oiled = p_oiled.sum(axis=1)
@@ -372,8 +373,8 @@ def plot_bacteria_biomass(scenario, control, time, start, end, event_start, y_mi
     for species in bacteria:
     
         if "pelagic" in species:
-            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,:,0:5], np.nan) # tonnes, take only water column layers
-            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,:,0:5], np.nan)
+            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,:,0:6], np.nan) # tonnes, take only water column layers
+            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,:,0:6], np.nan)
             b_oiled = bact_oiled.sum(axis=1)
             b_control = bact_control.sum(axis=1)
             b_oiled = b_oiled.sum(axis=1)
@@ -413,8 +414,8 @@ def plot_surface_biomass(group, scenario, control, time, start, end, event_start
 
     for species in group:
        
-        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,:,4:5], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,:,4:5], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,:,4:6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,:,4:6], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         p_oiled = p_oiled.sum(axis=1)
@@ -481,8 +482,8 @@ def plot_pelagic_biomass_box(group, scenario, box_number, control, time, start, 
 
     for species in group:
         
-        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,box_number,0:5], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,box_number,0:5], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,box_number,0:6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,box_number,0:6], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         p_max = p_oiled.max()
@@ -549,8 +550,8 @@ def plot_bacteria_biomass_box(scenario, box_number, control, time, start, end, e
     for species in bacteria:
         
         if "pelagic" in species:
-            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,box_number,0:5], np.nan) # tonnes, take only water column layers
-            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,box_number,0:5], np.nan)
+            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,box_number,0:6], np.nan) # tonnes, take only water column layers
+            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,box_number,0:6], np.nan)
             b_oiled = bact_oiled.sum(axis=1)
             b_control = bact_control.sum(axis=1)
         else:
@@ -586,8 +587,8 @@ def plot_surface_biomass_box(group, scenario, box_number, control, time, start, 
 
     for species in group:
         
-        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,box_number,4:5], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,box_number,4:5], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,box_number,4:6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,box_number,4:6], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         p_max = p_oiled.max()
@@ -654,8 +655,8 @@ def plot_pelagic_diff_box(group, scenario, box_number, control, time, start, end
 
     for species in group:
         
-        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,box_number,0:5], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,box_number,0:5], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,box_number,0:6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,box_number,0:6], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         diff = p_oiled - p_control
@@ -720,8 +721,8 @@ def plot_surface_diff_box(group, scenario, box_number, control, time, start, end
     
     for species in group:
 
-        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,box_number,4:5], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,box_number,4:5], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,box_number,4:6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,box_number,4:6], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         diff = p_oiled - p_control
@@ -742,8 +743,8 @@ def plot_bacteria_diff_box(scenario, box_number, control, time, start, end, even
 
     for species in bacteria:
         if "pelagic" in species:
-            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,box_number,0:5], np.nan) # tonnes, take only water column layers
-            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,box_number,0:5], np.nan)
+            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,box_number,0:6], np.nan) # tonnes, take only water column layers
+            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,box_number,0:6], np.nan)
             b_oiled = bact_oiled.sum(axis=1)
             b_control = bact_control.sum(axis=1)
         else:
@@ -768,8 +769,8 @@ def plot_bacteria_diff(scenario, control, time, start, end, event_start, y_min=N
 
     for species in bacteria:
         if "pelagic" in species:
-            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,:,0:5], np.nan) # tonnes, take only water column layers
-            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,:,0:5], np.nan)
+            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,:,0:6], np.nan) # tonnes, take only water column layers
+            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,:,0:6], np.nan)
             b_oiled = bact_oiled.sum(axis=2)
             b_control = bact_control.sum(axis=2)
             b_oiled = b_oiled.sum(axis=1)
@@ -798,8 +799,8 @@ def plot_pelagic_diff(group, scenario, control, time, start, end, event_start, y
 
     for species in group:
         
-        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,:,0:5], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,:,0:5], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,:,0:6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,:,0:6], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         p_oiled = p_oiled.sum(axis=1)
@@ -866,8 +867,8 @@ def plot_surface_diff(group, scenario, control, time, start, end, event_start, y
 
     for species in group:
 
-        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,:,4:5], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,:,4:5], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,:,4:6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,:,4:6], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         p_oiled = p_oiled.sum(axis=1)
@@ -953,8 +954,8 @@ def boxplot_pelagic(group, scenario, control, days, data_labels, x_lim=None, bio
     for species in group:
         results = list()
         for day in days:
-            p_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][day,:,0:5], np.nan) # tonnes, take only water column layers
-            p_control = np.ma.filled(control.variables[group[species] + '_N'][day,:,0:5], np.nan)
+            p_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][day,:,0:6], np.nan) # tonnes, take only water column layers
+            p_control = np.ma.filled(control.variables[group[species] + '_N'][day,:,0:6], np.nan)
             p_oiled = p_oiled.sum(axis=1)
             p_oiled = p_oiled.sum(axis=0)
             p_control = p_control.sum(axis=1)
@@ -1070,11 +1071,11 @@ def pelagic_compare_scenarios(group, scenario1, scenario2, scenario3, scenario4,
     gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
 
     for species in group:
-        pelagic_oiled1 = np.ma.filled(scenario1.variables[group[species] + '_N'][start:end,:,0:5], np.nan) # tonnes
-        pelagic_oiled2 = np.ma.filled(scenario2.variables[group[species] + '_N'][start:end,:,0:5], np.nan) # tonnes
-        pelagic_oiled3 = np.ma.filled(scenario3.variables[group[species] + '_N'][start:end,:,0:5], np.nan) # tonnes
-        pelagic_oiled4 = np.ma.filled(scenario4.variables[group[species] + '_N'][start:end,:,0:5], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,:,0:5], np.nan)
+        pelagic_oiled1 = np.ma.filled(scenario1.variables[group[species] + '_N'][start:end,:,0:6], np.nan) # tonnes
+        pelagic_oiled2 = np.ma.filled(scenario2.variables[group[species] + '_N'][start:end,:,0:6], np.nan) # tonnes
+        pelagic_oiled3 = np.ma.filled(scenario3.variables[group[species] + '_N'][start:end,:,0:6], np.nan) # tonnes
+        pelagic_oiled4 = np.ma.filled(scenario4.variables[group[species] + '_N'][start:end,:,0:6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,:,0:6], np.nan)
         # sum across depth
         pelagic_oiled1 = pelagic_oiled1.sum(axis=2) 
         pelagic_oiled2 = pelagic_oiled2.sum(axis=2) 
@@ -1144,11 +1145,11 @@ def pelagic_compare_nutrients(group, scenario1, scenario2, scenario3, scenario4,
     gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
 
     for species in group:
-        pelagic_oiled1 = np.ma.filled(scenario1.variables[group[species]][start:end,:,0:5], np.nan) # tonnes
-        pelagic_oiled2 = np.ma.filled(scenario2.variables[group[species]][start:end,:,0:5], np.nan) # tonnes
-        pelagic_oiled3 = np.ma.filled(scenario3.variables[group[species]][start:end,:,0:5], np.nan) # tonnes
-        pelagic_oiled4 = np.ma.filled(scenario4.variables[group[species]][start:end,:,0:5], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[group[species]][start:end,:,0:5], np.nan)
+        pelagic_oiled1 = np.ma.filled(scenario1.variables[group[species]][start:end,:,0:6], np.nan) # tonnes
+        pelagic_oiled2 = np.ma.filled(scenario2.variables[group[species]][start:end,:,0:6], np.nan) # tonnes
+        pelagic_oiled3 = np.ma.filled(scenario3.variables[group[species]][start:end,:,0:6], np.nan) # tonnes
+        pelagic_oiled4 = np.ma.filled(scenario4.variables[group[species]][start:end,:,0:6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[group[species]][start:end,:,0:6], np.nan)
         # sum across depth
         pelagic_oiled1 = pelagic_oiled1.sum(axis=2) 
         pelagic_oiled2 = pelagic_oiled2.sum(axis=2) 
@@ -1212,7 +1213,15 @@ def sediment_compare_nutrients(group, scenario1, scenario2, scenario3, scenario4
         ax.legend(['control', 'scenario 1', 'scenario 2', 'scenario 3'])
         ax.set_title(species);
 
-def map_pelagic_aggregate_time(variable_name, scenario1, scenario2, scenario3, control, map_df, v_max=-100, v_min=100):
+def map_pelagic_aggregate_time4(variable_name, scenario1, scenario2, scenario3, scenario4, control, v_max=100, v_min=-100):
+    
+    shapefile_name = "/ocean/rlovindeer/Atlantis/ssam_oceanparcels/SalishSea/SalishSea_July172019_2/SalishSea_July172019.shp"
+    map_df = gpd.read_file(shapefile_name)
+    map_df = map_df.sort_values(by=['BOX_ID'])
+    box_depth = map_df['BOTZ']
+    land_boxes = box_depth==0
+    land_boxes = map_df.index[land_boxes]
+    
     # map of single variable ratio across the whole simulation
 
     # Pull variables for all scenarios
@@ -1220,12 +1229,14 @@ def map_pelagic_aggregate_time(variable_name, scenario1, scenario2, scenario3, c
     dVar_s1 = scenario1.variables[variable_name]
     dVar_s2 = scenario2.variables[variable_name]
     dVar_s3 = scenario3.variables[variable_name]
+    dVar_s4 = scenario4.variables[variable_name]
 
     # Aggregate across depths
     dVar_control = dVar_control.sum(axis=2)
     dVar_s1 = dVar_s1.sum(axis=2)
     dVar_s2 = dVar_s2.sum(axis=2)
     dVar_s3 = dVar_s3.sum(axis=2)
+    dVar_s4 = dVar_s4.sum(axis=2)
 
     _cmap = cm.bwr # cm.ocean_r
     land_df = map_df.loc[land_boxes]
@@ -1235,25 +1246,25 @@ def map_pelagic_aggregate_time(variable_name, scenario1, scenario2, scenario3, c
     dVar_s1 = dVar_s1.sum(axis=0)
     dVar_s2 = dVar_s2.sum(axis=0)
     dVar_s3 = dVar_s3.sum(axis=0)
-
+    dVar_s4 = dVar_s4.sum(axis=0)
+    
     s1_oil = (dVar_s1 / dVar_control-1)*100 
     s2_oil = (dVar_s2 / dVar_control-1)*100  
     s3_oil = (dVar_s3 / dVar_control-1)*100  
+    s4_oil = (dVar_s4 / dVar_control-1)*100  
 
     # Add scenario data to Atlantis spatial data
-    box_depth = map_df['BOTZ']
-    land_boxes = box_depth==0
-    land_boxes = map_df.index[land_boxes]
-
     map_df['scen_1'] = s1_oil
     map_df['scen_2'] = s2_oil
     map_df['scen_3'] = s3_oil
+    map_df['scen_4'] = s4_oil
     map_df.loc[land_boxes, 'scen_1'] = 0
     map_df.loc[land_boxes, 'scen_2'] = 0
     map_df.loc[land_boxes, 'scen_3'] = 0
+    map_df.loc[land_boxes, 'scen_4'] = 0
 
-    fig = plt.figure(figsize=(18, 8), facecolor='white') #figsize=(9, 12)
-    gs = plt.GridSpec(1, 3, wspace=0.5, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1],)
+    fig = plt.figure(figsize=(29, 8), facecolor='white') #figsize=(9, 12)
+    gs = plt.GridSpec(1, 4, wspace=0.5, hspace=0.2, width_ratios=[1, 1, 1, 1], height_ratios=[1],)
 
     ax = fig.add_subplot(gs[0, 0])    
     ax = map_df.plot(column = 'scen_1', cmap=_cmap, vmin=v_min, vmax=v_max, ax=ax,
@@ -1275,12 +1286,66 @@ def map_pelagic_aggregate_time(variable_name, scenario1, scenario2, scenario3, c
         },)
     map_df.boundary.plot(ax=ax, color='grey', linewidths=0.7)
     land_df.plot(ax=ax, color='white');
+
+    ax = fig.add_subplot(gs[0, 3])
+    ax = map_df.plot(column = 'scen_4', cmap=_cmap, vmin=v_min, vmax=v_max, ax=ax,
+        legend=True, legend_kwds={'label': 'Scenario 4: ' + variable_name
+        },)
+    map_df.boundary.plot(ax=ax, color='grey', linewidths=0.7)
+    land_df.plot(ax=ax, color='white');
     
     return
 
-def map_pelagic_single_time(variable_name, scenario1, scenario2, scenario3, control, time, map_df, time_index, start, end, event_start, v_max=100, v_min=-100):
+def map_pelagic_aggregate_time(variable_name, scenario, control, v_max=100, v_min=-100):
+    
+    shapefile_name = "/ocean/rlovindeer/Atlantis/ssam_oceanparcels/SalishSea/SalishSea_July172019_2/SalishSea_July172019.shp"
+    map_df = gpd.read_file(shapefile_name)
+    map_df = map_df.sort_values(by=['BOX_ID'])
+    box_depth = map_df['BOTZ']
+    land_boxes = box_depth==0
+    land_boxes = map_df.index[land_boxes]
+    
+    # map of single variable ratio across the whole simulation
+
+    # Pull variables for all scenarios
+    dVar_control = control.variables[variable_name]
+    dVar_s = scenario.variables[variable_name]
+
+    # Aggregate across depths
+    dVar_control = dVar_control.sum(axis=2)
+    dVar_s = dVar_s.sum(axis=2)
+
+    _cmap = cm.bwr # cm.ocean_r
+    land_df = map_df.loc[land_boxes]
+
+    ## Aggregate across time
+    dVar_control = dVar_control.sum(axis=0)
+    dVar_s = dVar_s.sum(axis=0)
+
+    percent_oil = (dVar_s / dVar_control-1)*100 
+
+    # Add scenario data to Atlantis spatial data
+    map_df['percent'] = percent_oil
+    map_df.loc[land_boxes, 'percent'] = 0
+
+    fig = plt.figure(figsize=(9, 12))
+
+    ax = fig.add_subplot()
+    ax = map_df.plot(column = 'percent', cmap=_cmap, ax=ax, vmin=v_min, vmax=v_max,
+        legend=True, legend_kwds={'label': variable_name + ' % difference from control'
+        },)
+    map_df.boundary.plot(ax=ax, color='grey', linewidths=0.7)
+    land_df.plot(ax=ax, color='white');
+    
+    return
+
+def map_pelagic_single_time(variable_name, scenario1, scenario2, scenario3, control, time, time_index, start, end, event_start, v_max=100, v_min=-100):
     # map of single variable ratio at a specific time index
     
+    shapefile_name = "/ocean/rlovindeer/Atlantis/ssam_oceanparcels/SalishSea/SalishSea_July172019_2/SalishSea_July172019.shp"
+    map_df = gpd.read_file(shapefile_name)
+    map_df = map_df.sort_values(by=['BOX_ID'])
+
     ts_date = np.array(time[time_index])
 
     # Pull variables for all scenarios
@@ -1369,14 +1434,14 @@ def map_pelagic_single_time(variable_name, scenario1, scenario2, scenario3, cont
 
     return
 
-def animate_map_pelagic(variable_name, scenario1, scenario2, scenario3, control, time, map_df, start, end, event_start, v_max=100, v_min=-100):
+def animate_map_pelagic(variable_name, scenario1, scenario2, scenario3, control, time, start, end, event_start, v_max=100, v_min=-100):
     # animation of map of single variable ratio over time
 
     file_names = []
 
     for time_index in range(start, end):
     
-        map_pelagic_single_time(variable_name, scenario1, scenario2, scenario3, control, time, map_df, time_index, start, end, event_start)
+        map_pelagic_single_time(variable_name, scenario1, scenario2, scenario3, control, time, time_index, start, end, event_start)
         
         plot_name = variable_name + '_' + str(time_index).zfill(3) + '.png'
         plt.savefig(plot_name)
@@ -1406,9 +1471,13 @@ def animate_map_pelagic(variable_name, scenario1, scenario2, scenario3, control,
     
     return
 
-def map_benthic_single_time(variable_name, scenario1, scenario2, scenario3, control, time, map_df, time_index, start, end, event_start, v_max=100, v_min=-100):
+def map_benthic_single_time(variable_name, scenario1, scenario2, scenario3, control, time, time_index, start, end, event_start, v_max=100, v_min=-100):
     # map of single variable ratio at a specific time index
     
+    shapefile_name = "/ocean/rlovindeer/Atlantis/ssam_oceanparcels/SalishSea/SalishSea_July172019_2/SalishSea_July172019.shp"
+    map_df = gpd.read_file(shapefile_name)
+    map_df = map_df.sort_values(by=['BOX_ID'])
+
     ts_date = np.array(time[time_index])
 
     # Pull variables for all scenarios
@@ -1494,14 +1563,14 @@ def map_benthic_single_time(variable_name, scenario1, scenario2, scenario3, cont
 
     return
 
-def animate_map_benthic(variable_name, scenario1, scenario2, scenario3, control, time, map_df, start, end, event_start, v_max=100, v_min=-100):
+def animate_map_benthic(variable_name, scenario1, scenario2, scenario3, control, time, start, end, event_start, v_max=100, v_min=-100):
     # animation of single variable ratio over time
 
     file_names = []
 
     for time_index in range(start, end):
     
-        map_benthic_single_time(variable_name, scenario1, scenario2, scenario3, control, time, map_df, time_index, start, end, event_start)
+        map_benthic_single_time(variable_name, scenario1, scenario2, scenario3, control, time, time_index, start, end, event_start)
         
         plot_name = variable_name + '_' + str(time_index).zfill(3) + '.png'
         plt.savefig(plot_name)
