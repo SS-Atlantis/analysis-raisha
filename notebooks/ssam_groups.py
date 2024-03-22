@@ -125,3 +125,33 @@ planktonic = {
 detritus = {
     'labile detritus':'Lab_Det','refractory detritus':'Ref_Det',
 }
+
+salish_sea = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 18, 19, 20, 21, 23, 26, 28, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+    40, 54, 55, 57, 58, 60, 62, 63, 64, 66, 68, 72, 73, 74, 75, 79, 80, 81, 82, 83, 84, 85, 86, 88, 90, 91,92, 94, 96, 98, 101, 
+    102, 103, 104, 105, 106, 107, 108, 109, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124]
+juan_de_fuca = [1,2,3,4,5,6,7,8,9,10,11]
+haro_boundary = {60,33,34,35,36,}
+strait_of_georgia = [54,64,68,79,80,81,82,83,84,85,88,92.98,101,102]
+sog_south = [54,64,68,79]
+sog_center = [80,81,82,83,84,85]
+sog_north = [88,92.98,101,102]
+puget_sound_main = [20,21,23,26]
+
+
+sensitivity = {'carnivorous zooplankton':8.6, 'gelatinous zooplantkon':2.1, 'microzooplankton':5.8,
+    'mesozooplankton':1.7, 'diatoms':0.3, 'picophytoplankton':1.0, 'pelagic bacteria':0.8,
+    'squid':1.7, 'prawn': 3.3, 'benthic grazers':0.0, 'other filter feeders': 0.0, 'macrobenthos':0.1,  
+    'sponges':1.3, 'bivalves':0.1, 'crabs':0.6, 'dungeness crabs':0.1,
+    'macroalgae':0.2, 'seagrass':4.2, 'benthic carnivores':0.0, 'deposit feeders':0.1, 'meiobenthos':0.8, 'sedimentary bacteria': 0.6,
+    'dogfish':0.2,'ratfish':0.1, 'sixgill':0.0, 'skates':0.4,
+    'seagulls':0.3, 'other seabirds':0.2,
+    'porpoises':1.2, 'seals':0.1, 'humpbacks':0.3,'sealions':0.0,
+    'resident orcas':0.1, 'transient orcas':0.0,
+    'benthopelagic':0.2, 'small pelagic':2.9, 'small demersal':0.3, 
+    'large demersal':0.5, 'small flatfish':0.1, 'large flatfish':0.2,
+    'hake':0.4,'lingcod':0.4, 'pollock':0.1, 'sandlance':16, 
+    'rockfish':0.5, 'pacific herring':0.7,
+    'Chinook':0.3, 'Chum':0.6, 'Coho':0.8,'Pink':0.3, 'Sockeye':0.4, 
+    'Hatchery Chinook':0.4,'Hatchery Coho':0.5,'Hatchery Sockeye':1.6, 
+    'Other salmonids':0.0,
+}
