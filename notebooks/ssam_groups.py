@@ -35,8 +35,8 @@ named_fish = {
 
 salmon = {
     'Chinook':'Chinook_salmon', 'Chum':'Chum_salmon', 'Coho':'Coho_salmon','Pink':'Pink_salmon', 'Sockeye':'Sockeye_salmon', 
-    'Hatchery Chinook':'Hatchery_Chinook_salmon','Hatchery Coho':'Hatchery_Coho_salmon','Hatchery Sockeye':'Hatchery_Sockeye_salmon', 
-    'Other salmonids':'Other_salmonids'
+    'Hatchery Chinook':'Hatchery_Chinook_salmon','Hatchery Coho':'Hatchery_Coho_salmon','Hatchery Sockeye':'Hatchery_Sockeye_salmon'
+    #,'Other salmonids':'Other_salmonids'
 }
 
 benthic_invertebrates = { #benthic, 1 depth
@@ -114,4 +114,14 @@ all_pelagic = {
 nutrients = {
     'ammonia':'NH3', 'nitrate':'NO3', 'dissolved organic nitrogen':'DON', 'micronutrients': 'MicroNut', 
     'dissolved silica':'Si', 'detrital silica':'Det_Si',
+}
+
+planktonic = {
+    'carnivorous zooplankton':'Carniv_Zoo', 'gelatinous zooplantkon':'Gelat_Zoo', 'microzooplankton':'MicroZoo',
+    'mesozooplankton':'Zoo', 'diatoms':'Diatom', 'picophytoplankton':'PicoPhytopl', 'pelagic bacteria':'Pelag_Bact',
+    'squid':'Squid', 'prawn': 'Prawn', 
+}
+
+detritus = {
+    'labile detritus':'Lab_Det','refractory detritus':'Ref_Det',
 }
