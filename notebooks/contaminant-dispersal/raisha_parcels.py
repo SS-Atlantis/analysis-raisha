@@ -29,9 +29,9 @@ from util.seed_particles import get_particles, get_release_times
 
 # %%
 # Spill release times (years 2019 and 2020 only)
-release_start_time = '2019-07-03' 
-release_end_time = '2019-07-04'
-release_YYYY = '2019-07'
+release_start_time = '2019-01-20' 
+release_end_time = '2019-01-21'
+release_YYYY = '2019-01'
 
 # %% [markdown]
 # Select the location of interest, which is specified by a shapefile.
@@ -223,7 +223,7 @@ ForcingWind_kernel = pset.Kernel(WindAdvectionRK4)
 # Adding to the main kernel
 my_kernel =  AdvectionRK4 + decay_kernel + ForcingWind_kernel + beaching_kernel
 
-output_file_name = scenario + '_' + str(release_start_time) +  '_10000_OP_D50_wp3.nc'
+output_file_name = scenario + '_' + str(release_start_time) +  '_' + str(num_particles_per_day)+ '_OP_D50_wp3.zarr'
 print(output_file_name)
 
 # %%
@@ -238,7 +238,7 @@ print('executing particle kernel')
 ## Output properties
 output_file = pset.ParticleFile(name= output_file_name, outputdt = timedelta(minutes = 60))
 pset.execute(my_kernel,                 # the kernel (which defines how particles move)
-             runtime=timedelta(hours = 24*7),   # the total length of the run
+             runtime=timedelta(hours = 24*10),   # the total length of the run
              dt = timedelta(minutes = 60),      # the timestep of the kernel
              output_file = output_file,          # the file name and the time step of the outputs
              recovery={ErrorCode.ErrorOutOfBounds: DeleteParticle})  # 
