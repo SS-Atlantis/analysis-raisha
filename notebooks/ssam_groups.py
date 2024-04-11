@@ -131,11 +131,12 @@ salish_sea = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 18, 19, 20, 21,
     102, 103, 104, 105, 106, 107, 108, 109, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124]
 juan_de_fuca = [1,2,3,4,5,6,7,8,9,10,11]
 haro_boundary = {60,33,34,35,36,}
-strait_of_georgia = [54,64,68,79,80,81,82,83,84,85,88,92.98,101,102]
+strait_of_georgia = [54,64,68,79,80,81,82,83,84,85,88,92,98,101,102]
 sog_south = [54,64,68,79]
 sog_center = [80,81,82,83,84,85]
 sog_north = [88,92.98,101,102]
 puget_sound_main = [20,21,23,26]
+fraser_river = [75,80,81]
 
 
 sensitivity = {'carnivorous zooplankton':8.6, 'gelatinous zooplantkon':2.1, 'microzooplankton':5.8,

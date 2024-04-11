@@ -7,6 +7,8 @@ import geopandas as gpd
 import matplotlib.cm as cm
 from ssam_groups import cohorts
 from ssam_groups import bacteria
+from ssam_groups import pahs
+from ssam_groups import sensitivity
 from PIL import Image
 import glob
 from IPython.display import Image as img
@@ -16,113 +18,16 @@ label_size = 11
 font_size = 12
 line_width = 2
 
-
-def plot_bacteria(scenario, control, time, start, end, event_start, y_min=None, y_max=None):
-
-    fig, ax = plt.subplots(figsize = (14,3))
-    ax.tick_params(labelsize=label_size)
-    ax.set_ylabel('scenario:control')
-    ax.set_title('Change relative to control of Bacteria groups in Salish Sea Atlantis', fontsize = font_size)
-
-    for species in bacteria:
-        if "pelagic" in species:
-            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,:,0:6], np.nan) # tonnes, take only water column layers
-            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,:,0:6,], np.nan)
-            b_oiled = bact_oiled.sum(axis=2)
-            b_control = bact_control.sum(axis=2)
-        else:
-            b_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,:,6], np.nan) # tonnes, take only sediment layer
-            b_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,:,6], np.nan)
-        
-        ratio = b_oiled.sum(axis=1) / b_control.sum(axis=1) 
-        control_ratio = b_control.sum(axis=1) / b_control.sum(axis=1)
-        ax.plot(time[start:end], ratio, linewidth = 2)
+def compare_pelagic_groups(bio_group, scenario, control, time, start, end, boxes, event_start, y_min=None, y_max=None): #bacteria, plankton
     
-    ax.legend(bacteria, loc='center left')
-    ax.plot(event_start, 1, 'ro', alpha=0.5)
-    ax.plot(time[start:end], control_ratio, 'k',linewidth = 2)
-    ax.set_ylim([y_min, y_max])
-    #ax.plot([spill_end, spill_end], [ratio.min(), ratio.max()], 'r',alpha=0.1)
-
-def plot_sediment(bio_group, scenario, control, time, start, end, event_start, y_min=None, y_max=None): #bacteria, plankton
-
     fig, ax = plt.subplots(figsize = (14,3))
     ax.tick_params(labelsize=label_size)
     ax.set_ylabel('scenario:control')
-    ax.set_title('Change relative to control of Sediment groups in Salish Sea Atlantis', fontsize = font_size)
+    ax.set_title('Change in surface groups relative to control', fontsize = font_size)
 
     for species in bio_group:
-        sed_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,:,6], np.nan) # tonnes
-        sed_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,:,6], np.nan)
-        s_oiled = sed_oiled.sum(axis=1)
-        s_control = sed_control.sum(axis=1)
-        ratio = s_oiled / s_control
-        control_ratio = s_control / s_control
-        ax.plot(time[start:end], ratio, linewidth = 2)
-    
-    ax.legend(bio_group, loc='center left')
-    ax.plot(event_start, 1, 'ro', alpha=0.5)
-    ax.plot(time[start:end], control_ratio, 'k',linewidth = 2)
-    ax.set_ylim([y_min, y_max])
-    #ax.plot([spill_end, spill_end], [ratio.min(), ratio.max()], 'r',alpha=0.1)
-
-def plot_benthic_box(bio_group, scenario, box_number, control, time, start, end, event_start, y_min=None, y_max=None): # benthos, shellfish
-
-    fig, ax = plt.subplots(figsize = (14,3))
-    ax.tick_params(labelsize=label_size)
-    ax.set_ylabel('scenario:control')
-    ax.set_title('Change relative to control of Benthic groups in Salish Sea Atlantis box ' + str(box_number), fontsize = font_size)
-
-    for species in bio_group:
-        benthic_oiled = scenario.variables[bio_group[species] + '_N'][start:end,box_number] # tonnes
-        benthic_control = control.variables[bio_group[species] + '_N'][start:end,box_number]
-        ratio = benthic_oiled / benthic_control
-        control_ratio = benthic_control / benthic_control
-        ax.plot(time[start:end], ratio, linewidth = 2)
-    
-    ax.legend(bio_group, loc='center left')
-    ax.plot(event_start, 1, 'ro', alpha=0.5)
-    ax.plot(time[start:end], control_ratio, 'k',linewidth = 2)
-    ax.set_ylim(y_min, y_max)
-    #ax.plot([spill_end, spill_end], [min, max], 'r',alpha=0.1)
-
-def plot_bacteria_box(scenario, box_number, control, time, start, end, event_start, y_min=None, y_max=None): #bacteria, plankton
-
-    fig, ax = plt.subplots(figsize = (14,3))
-    ax.tick_params(labelsize=label_size)
-    ax.set_ylabel('scenario:control')
-    ax.set_title('Change in bacteria relative to control in Salish Sea Atlantis box ' + str(box_number), fontsize = font_size)
-
-    for species in bacteria:
-        if "pelagic" in species:
-            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,box_number,0:6], np.nan) # tonnes, take only water column layers
-            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,box_number,0:6], np.nan)
-            b_oiled = bact_oiled.sum(axis=1)
-            b_control = bact_control.sum(axis=1)
-        else:
-            b_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,box_number,6], np.nan) # tonnes, take only sediment layer
-            b_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,box_number,6], np.nan)
-        
-        ratio = b_oiled / b_control
-        control_ratio = b_control / b_control
-        ax.plot(time[start:end], ratio, linewidth = 2)
-    
-    ax.legend(bacteria, loc='center left')
-    ax.plot(time[start:end], control_ratio, 'k',linewidth = 2)
-    ax.plot(event_start, 1, 'ro', alpha=0.5)
-    ax.set_ylim([y_min, y_max])
-    #ax.plot([spill_end, spill_end], [y_min, y_max], 'r',alpha=0.1)
-
-def plot_pelagic_box(bio_group, scenario, box_number, control, time, start, end, event_start, y_min=None, y_max=None): #bacteria, plankton
-    
-    fig, ax = plt.subplots(figsize = (14,3))
-    ax.tick_params(labelsize=label_size)
-    ax.set_ylabel('scenario:control')
-    ax.set_title('Change in pelagic groups relative to control in Salish Sea Atlantis box ' + str(box_number), fontsize = font_size)
-
-    for species in bio_group:
-        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,box_number,0:6], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,box_number,0:6], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,boxes,0:6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,boxes,0:6], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         ratio = p_oiled / p_control
@@ -135,16 +40,35 @@ def plot_pelagic_box(bio_group, scenario, box_number, control, time, start, end,
     ax.set_ylim([y_min, y_max])
     #ax.plot([spill_end, spill_end], [y_min, y_max], 'r',alpha=0.1)
 
-def plot_surface_box(bio_group, scenario, box_number, control, time, start, end, event_start, y_min=None, y_max=None): #bacteria, plankton
+def compare_benthic_groups(bio_group, scenario, control, time, start, end, boxes, event_start, y_min=None, y_max=None):
+
+    fig, ax = plt.subplots(figsize = (14,3))
+    ax.tick_params(labelsize=label_size)
+    ax.set_ylabel('scenario:control')
+    ax.set_title('Change in sediment groups relative to control', fontsize = font_size)
+
+    for species in bio_group:
+        s_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,boxes], np.nan) # tonnes
+        s_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,boxes], np.nan)
+        ratio = s_oiled / s_control
+        control_ratio = s_control / s_control
+        ax.plot(time[start:end], ratio, linewidth = 2)
+    
+    ax.legend(bio_group, loc='center left')
+    ax.plot(time[start:end], control_ratio, 'k',linewidth = 2)
+    ax.plot(event_start, 1, 'ro', alpha=0.5)
+    ax.set_ylim([y_min, y_max])
+
+def compare_groups_in_surface(bio_group, scenario, control, time, start, end, boxes, event_start, y_min=None, y_max=None): #bacteria, plankton
     
     fig, ax = plt.subplots(figsize = (14,3))
     ax.tick_params(labelsize=label_size)
     ax.set_ylabel('scenario:control')
-    ax.set_title('Change in surface groups relative to control in Salish Sea Atlantis box ' + str(box_number), fontsize = font_size)
+    ax.set_title('Change in surface groups relative to control', fontsize = font_size)
 
     for species in bio_group:
-        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,box_number,4:6], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,box_number,4:6], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,boxes,4:6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,boxes,4:6], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         ratio = p_oiled / p_control
@@ -157,16 +81,16 @@ def plot_surface_box(bio_group, scenario, box_number, control, time, start, end,
     ax.set_ylim([y_min, y_max])
     #ax.plot([spill_end, spill_end], [y_min, y_max], 'r',alpha=0.1)
 
-def plot_sediment_box(bio_group, scenario, box_number, control, time, start, end, event_start, y_min=None, y_max=None): #mostly for sediment_feeders
+def compare_groups_in_sediment(bio_group, scenario, control, time, start, end, boxes, event_start, y_min=None, y_max=None): #mostly for sediment_feeders
 
     fig, ax = plt.subplots(figsize = (14,3))
     ax.tick_params(labelsize=label_size)
     ax.set_ylabel('scenario:control')
-    ax.set_title('Change in sediment groups relative to control in Salish Sea Atlantis box ' + str(box_number), fontsize = font_size)
+    ax.set_title('Change in sediment groups relative to control', fontsize = font_size)
 
     for species in bio_group:
-        s_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,box_number,6], np.nan) # tonnes
-        s_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,box_number,6], np.nan)
+        s_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,boxes,6], np.nan) # tonnes
+        s_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,boxes,6], np.nan)
         ratio = s_oiled / s_control
         control_ratio = s_control / s_control
         ax.plot(time[start:end], ratio, linewidth = 2)
@@ -176,7 +100,7 @@ def plot_sediment_box(bio_group, scenario, box_number, control, time, start, end
     ax.plot(event_start, 1, 'ro', alpha=0.5)
     ax.set_ylim([y_min, y_max])
 
-def plot_cohorts(bio_group, scenario, control, time, start, end, event_start):
+def compare_cohorts(bio_group, scenario, control, time, start, end, boxes, event_start):
 
     for species in bio_group:
 
@@ -191,13 +115,13 @@ def plot_cohorts(bio_group, scenario, control, time, start, end, event_start):
 
             new_species = bio_group[species] + str(cohort)
         
-            o_numbers = np.ma.filled(scenario.variables[new_species + '_Nums'][start:end,:,:], np.nan)
-            o_structuralN = np.ma.filled(scenario.variables[new_species +'_StructN'][start:end,:,:], np.nan)
-            o_reservedN = np.ma.filled(scenario.variables[new_species +'_ResN'][start:end,:,:], np.nan)
+            o_numbers = np.ma.filled(scenario.variables[new_species + '_Nums'][start:end,boxes,:], np.nan)
+            o_structuralN = np.ma.filled(scenario.variables[new_species +'_StructN'][start:end,boxes,:], np.nan)
+            o_reservedN = np.ma.filled(scenario.variables[new_species +'_ResN'][start:end,boxes,:], np.nan)
 
-            c_numbers = np.ma.filled(control.variables[new_species + '_Nums'][start:end,:,:], np.nan)
-            c_structuralN = np.ma.filled(control.variables[new_species +'_StructN'][start:end,:,:], np.nan)
-            c_reservedN = np.ma.filled(control.variables[new_species +'_ResN'][start:end,:,:], np.nan)
+            c_numbers = np.ma.filled(control.variables[new_species + '_Nums'][start:end,boxes,:], np.nan)
+            c_structuralN = np.ma.filled(control.variables[new_species +'_StructN'][start:end,boxes,:], np.nan)
+            c_reservedN = np.ma.filled(control.variables[new_species +'_ResN'][start:end,boxes,:], np.nan)
 
             o_numbers = o_numbers.sum(axis=2)
             o_structuralN = o_structuralN.sum(axis=2)
@@ -227,15 +151,15 @@ def plot_cohorts(bio_group, scenario, control, time, start, end, event_start):
         ax[2].tick_params(labelsize=label_size);
         
 
-def plot_pelagic_biomass(bio_group, scenario, control, time, start, end, event_start, y_min=None, y_max=None):
+def pelagic_biomass(bio_group, scenario, control, time, start, end, boxes, event_start, y_min=None, y_max=None):
 
     fig = plt.figure(figsize=(18, 14), facecolor='white')
     gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1]) 
 
     for species in bio_group:
         
-        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,:,0:6], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,:,0:6], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,boxes,0:6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,boxes,0:6], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         p_oiled = p_oiled.sum(axis=1)
@@ -263,15 +187,15 @@ def plot_pelagic_biomass(bio_group, scenario, control, time, start, end, event_s
         #ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12)  # to place the legend outside
     ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);
 
-def plot_benthic_biomass(bio_group, scenario, control, time, start, end, event_start, y_min=None, y_max=None): 
+def benthic_biomass(bio_group, scenario, control, time, start, end, boxes, event_start, y_min=None, y_max=None): 
 
     fig = plt.figure(figsize=(18, 14), facecolor='white')
     gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1]) 
 
     for species in bio_group:
 
-        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,:], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,:], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,boxes], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,boxes], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         p_max = p_oiled.max()
@@ -296,7 +220,7 @@ def plot_benthic_biomass(bio_group, scenario, control, time, start, end, event_s
         ax.set_ylim([y_min, y_max])
     ax.legend(['scenario', 'control', 'event start'], bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);
 
-def plot_bacteria_biomass(scenario, control, time, start, end, event_start, y_min=None, y_max=None): 
+def bacteria_biomass(scenario, control, time, start, end, boxes, event_start, y_min=None, y_max=None): 
 
     bio_group = bacteria
     fig = plt.figure(figsize=(18, 14), facecolor='white')
@@ -305,15 +229,15 @@ def plot_bacteria_biomass(scenario, control, time, start, end, event_start, y_mi
     for species in bacteria:
     
         if "pelagic" in species:
-            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,:,0:6], np.nan) # tonnes, take only water column layers
-            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,:,0:6], np.nan)
+            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,boxes,0:6], np.nan) # tonnes, take only water column layers
+            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,boxes,0:6], np.nan)
             b_oiled = bact_oiled.sum(axis=1)
             b_control = bact_control.sum(axis=1)
             b_oiled = b_oiled.sum(axis=1)
             b_control = b_control.sum(axis=1)
         else:
-            b_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,:,6], np.nan) # tonnes, take only sediment layer
-            b_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,:,6], np.nan)
+            b_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,boxes,6], np.nan) # tonnes, take only sediment layer
+            b_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,boxes,6], np.nan)
             b_oiled = b_oiled.sum(axis=1)
             b_control = b_control.sum(axis=1)
         
@@ -339,15 +263,15 @@ def plot_bacteria_biomass(scenario, control, time, start, end, event_start, y_mi
         ax.set_ylim([y_min, y_max])
     ax.legend(['scenario', 'control', 'event start'], bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);        
 
-def plot_surface_biomass(bio_group, scenario, control, time, start, end, event_start, y_min=None, y_max=None): # benthos, shellfish
+def surface_biomass(bio_group, scenario, control, time, start, end, boxes, event_start, y_min=None, y_max=None): # benthos, shellfish
     
     fig = plt.figure(figsize=(18, 14), facecolor='white')
     gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
 
     for species in bio_group:
        
-        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,:,4:6], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,:,4:6], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,boxes,4:6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,boxes,4:6], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         p_oiled = p_oiled.sum(axis=1)
@@ -374,15 +298,15 @@ def plot_surface_biomass(bio_group, scenario, control, time, start, end, event_s
         ax.plot([event_start,event_start],[p_min, p_max], 'r', alpha=0.5)
     ax.legend(['scenario', 'control', 'event start'], bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);
 
-def plot_sediment_biomass(bio_group, scenario, control, time, start, end, event_start, y_min=None, y_max=None): 
+def sediment_biomass(bio_group, scenario, control, time, start, end, boxes, event_start, y_min=None, y_max=None): 
 
     fig = plt.figure(figsize=(18, 14), facecolor='white')
     gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
 
     for species in bio_group:
         
-        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,:,6], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,:,6], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,boxes,6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,boxes,6], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         p_max = p_oiled.max()
@@ -407,188 +331,17 @@ def plot_sediment_biomass(bio_group, scenario, control, time, start, end, event_
         ax.plot([event_start,event_start],[p_min, p_max], 'r', alpha=0.5)
     ax.legend(['scenario', 'control', 'event start'], bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);
 
-def plot_pelagic_biomass_box(bio_group, scenario, box_number, control, time, start, end, event_start, y_min=None, y_max=None):
-
-    fig = plt.figure(figsize=(18, 14), facecolor='white')
-    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
-
-    for species in bio_group:
-        
-        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,box_number,0:6], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,box_number,0:6], np.nan)
-        p_oiled = pelagic_oiled.sum(axis=1)
-        p_control = pelagic_control.sum(axis=1)
-        p_max = p_oiled.max()
-        p_min = p_oiled.min()
-
-        bio_index = (list(bio_group).index(species))
-
-        if bio_index < 3:
-            position = 0, bio_index
-        elif bio_index > 5: 
-            position = 2, bio_index-6
-        else :
-            position = 1, bio_index-3
-
-        ax = fig.add_subplot(gs[position])
-        ax.tick_params(labelsize=label_size)
-        ax.set_ylabel('mg N$^{-3}$') 
-        ax.set_title(str(bio_group[species]) + ' in Atlantis box ' + str(box_number), fontsize = font_size)
-        ax.set_ylim([y_min, y_max])
-        ax.plot(time[start:end], p_oiled, linewidth = 2)
-        ax.plot(time[start:end], p_control, 'k',linewidth = 1)
-        ax.plot([event_start,event_start],[p_min, p_max], 'r', alpha=0.5)
-    ax.legend(['scenario', 'control', 'event start'], bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);
-
-def plot_benthic_biomass_box(bio_group, scenario, box_number, control, time, start, end, event_start, y_min=None, y_max=None): 
-    
-    fig = plt.figure(figsize=(18, 14), facecolor='white')
-    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
-   
-    for species in bio_group:
-        
-        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,box_number], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,box_number], np.nan)
-        p_oiled = pelagic_oiled
-        p_control = pelagic_control
-        p_max = p_oiled.max()
-        p_min = p_oiled.min()
-
-        bio_index = (list(bio_group).index(species))
-
-        if bio_index < 3:
-            position = 0, bio_index
-        elif bio_index > 5: 
-            position = 2, bio_index-6
-        else :
-            position = 1, bio_index-3
-
-        ax = fig.add_subplot(gs[position])
-        ax.tick_params(labelsize=label_size)
-        ax.set_ylabel('mg N$^{-3}$')
-        ax.set_title(str(bio_group[species]) + ' in Atlantis box ' + str(box_number), fontsize = font_size)
-        ax.set_ylim([y_min, y_max])
-        ax.plot(time[start:end], p_oiled, linewidth = 2)
-        ax.plot(time[start:end], p_control, 'k',linewidth = 1)
-        ax.plot([event_start,event_start],[p_min, p_max], 'r', alpha=0.5)
-    ax.legend(['scenario', 'control', 'event start'], bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);
-
-def plot_bacteria_biomass_box(scenario, box_number, control, time, start, end, event_start, y_min=None, y_max=None): 
-
-    bio_group = bacteria
-    fig = plt.figure(figsize=(18, 14), facecolor='white')
-    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
-
-    for species in bacteria:
-        
-        if "pelagic" in species:
-            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,box_number,0:6], np.nan) # tonnes, take only water column layers
-            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,box_number,0:6], np.nan)
-            b_oiled = bact_oiled.sum(axis=1)
-            b_control = bact_control.sum(axis=1)
-        else:
-            b_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,box_number,6], np.nan) # tonnes, take only sediment layer
-            b_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,box_number,6], np.nan)
-        
-        p_max = b_oiled.max()
-        p_min = b_oiled.min()
-        
-        bio_index = (list(bio_group).index(species))
-
-        if bio_index < 3:
-            position = 0, bio_index
-        elif bio_index > 5: 
-            position = 2, bio_index-6
-        else :
-            position = 1, bio_index-3
-
-        ax = fig.add_subplot(gs[position])
-        ax.tick_params(labelsize=label_size)
-        ax.set_ylabel('mg N$^{-3}$')
-        ax.set_title(str(bio_group[species]) + ' in Atlantis box ' + str(box_number), fontsize = font_size)
-        ax.set_ylim([y_min, y_max])
-        ax.plot(time[start:end], b_oiled, linewidth = 2)
-        ax.plot(time[start:end], b_control, 'k',linewidth = 1)
-        ax.plot([event_start,event_start],[p_min, p_max], 'r', alpha=0.5)
-    ax.legend(['scenario', 'control', 'event start'], bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);
-
-def plot_surface_biomass_box(bio_group, scenario, box_number, control, time, start, end, event_start, y_min=None, y_max=None): 
-
-    fig = plt.figure(figsize=(18, 14), facecolor='white')
-    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
-
-    for species in bio_group:
-        
-        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,box_number,4:6], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,box_number,4:6], np.nan)
-        p_oiled = pelagic_oiled.sum(axis=1)
-        p_control = pelagic_control.sum(axis=1)
-        p_max = p_oiled.max()
-        p_min = p_oiled.min()
-
-        bio_index = (list(bio_group).index(species))
-
-        if bio_index < 3:
-            position = 0, bio_index
-        elif bio_index > 5: 
-            position = 2, bio_index-6
-        else :
-            position = 1, bio_index-3
-
-        ax = fig.add_subplot(gs[position])
-        ax.tick_params(labelsize=label_size)
-        ax.set_ylabel('mg N$^{-3}$')
-        ax.set_title('Surface Biomass of ' + str(bio_group[species]) + ' in Salish Sea Atlantis box ' + str(box_number), fontsize = font_size)
-        ax.set_ylim([y_min, y_max])
-        ax.plot(time[start:end], p_oiled, linewidth = 2)
-        ax.plot(time[start:end], p_control, 'k',linewidth = 1)
-        ax.plot([event_start,event_start],[p_min, p_max], 'r', alpha=0.5)
-    ax.legend(['scenario', 'control', 'event start'], bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);
-
-def plot_sediment_biomass_box(bio_group, scenario, box_number, control, time, start, end, event_start, y_min=None, y_max=None): 
-
-    fig = plt.figure(figsize=(18, 14), facecolor='white')
-    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
-
-    for species in bio_group:
-        
-        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,box_number,6], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,box_number,6], np.nan)
-        p_oiled = pelagic_oiled
-        p_control = pelagic_control
-        p_max = p_oiled.max()
-        p_min = p_oiled.min()
-        
-        bio_index = (list(bio_group).index(species))
-
-        if bio_index < 3:
-            position = 0, bio_index
-        elif bio_index > 5: 
-            position = 2, bio_index-6
-        else :
-            position = 1, bio_index-3
-
-        ax = fig.add_subplot(gs[position])
-        ax.tick_params(labelsize=label_size)
-        ax.set_ylabel('mg N$^{-3}$')
-        ax.set_title(str(bio_group[species]) + ' in Atlantis box ' + str(box_number), fontsize = font_size)
-        ax.set_ylim([y_min, y_max])
-        ax.plot(time[start:end], p_oiled, linewidth = 2)
-        ax.plot(time[start:end], p_control, 'k',linewidth = 1)
-        ax.plot([event_start,event_start],[p_min, p_max], 'r', alpha=0.5)
-    ax.legend(['scenario', 'control', 'event start'], bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);
-
-def plot_pelagic_diff_box(bio_group, scenario, box_number, control, time, start, end, event_start, y_min=None, y_max=None):
+def difference_between_scenario_and_control_pelagic(bio_group, scenario, control, time, start, end, boxes, event_start, y_min=None, y_max=None):
 
     fig, ax = plt.subplots(figsize = (14,3))
     ax.tick_params(labelsize=label_size)
     ax.set_ylabel('scenario - control (mg N$^{-3}$)')
-    ax.set_title('Difference in Pelagic Biomass in Salish Sea Atlantis box ' + str(box_number), fontsize = font_size)
+    ax.set_title('Difference in Pelagic Biomass', fontsize = font_size)
 
     for species in bio_group:
         
-        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,box_number,0:6], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,box_number,0:6], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,boxes,0:6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,boxes,0:6], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         diff = p_oiled - p_control
@@ -600,17 +353,17 @@ def plot_pelagic_diff_box(bio_group, scenario, box_number, control, time, start,
     ax.plot(event_start, 0, 'ro', alpha=0.5)
     ax.set_ylim([y_min, y_max])
 
-def plot_benthic_diff_box(bio_group, scenario, box_number, control, time, start, end, event_start, y_min=None, y_max=None): 
+def difference_between_scenario_and_control_benthic(bio_group, scenario, control, time, start, end, boxes, event_start, y_min=None, y_max=None): 
 
     fig, ax = plt.subplots(figsize = (14,3))
     ax.tick_params(labelsize=label_size)
     ax.set_ylabel('scenario - control (mg N$^{-3}$)')
-    ax.set_title('Difference in Benthic Biomass in Salish Sea Atlantis box ' + str(box_number), fontsize = font_size)
+    ax.set_title('Difference in Benthic Biomass', fontsize = font_size)
 
     for species in bio_group:
         
-        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,box_number], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,box_number], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,boxes], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,boxes], np.nan)
         p_oiled = pelagic_oiled
         p_control = pelagic_control
         diff = p_oiled - p_control
@@ -622,17 +375,17 @@ def plot_benthic_diff_box(bio_group, scenario, box_number, control, time, start,
     ax.plot(event_start, 0, 'ro', alpha=0.5)
     ax.set_ylim([y_min, y_max])
 
-def plot_sediment_diff_box(bio_group, scenario, box_number, control, time, start, end, event_start, y_min=None, y_max=None): 
+def difference_between_scenario_and_control_sediment(bio_group, scenario, control, time, start, end, boxes, event_start, y_min=None, y_max=None): 
 
     fig, ax = plt.subplots(figsize = (14,3))
     ax.tick_params(labelsize=label_size)
     ax.set_ylabel('scenario - control (mg N$^{-3}$)')
-    ax.set_title('Difference in Sediment Biomass in Salish Sea Atlantis box ' + str(box_number), fontsize = font_size)
+    ax.set_title('Difference in Sediment Biomass', fontsize = font_size)
 
     for species in bio_group:
         
-        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,box_number,6], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,box_number,6], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,boxes,6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,boxes,6], np.nan)
         p_oiled = pelagic_oiled
         p_control = pelagic_control
         diff = p_oiled - p_control
@@ -644,17 +397,17 @@ def plot_sediment_diff_box(bio_group, scenario, box_number, control, time, start
     ax.plot(event_start, 0, 'ro', alpha=0.5)
     ax.set_ylim([y_min, y_max])
 
-def plot_surface_diff_box(bio_group, scenario, box_number, control, time, start, end, event_start, y_min=None, y_max=None): 
+def difference_between_scenario_and_control_surface(bio_group, scenario, control, time, start, end, boxes, event_start, y_min=None, y_max=None): 
 
     fig, ax = plt.subplots(figsize = (14,3))
     ax.tick_params(labelsize=label_size)
     ax.set_ylabel('scenario - control (mg N$^{-3}$)')
-    ax.set_title('Difference Surface Biomass in Salish Sea Atlantis box ' + str(box_number), fontsize = font_size)
+    ax.set_title('Difference in Surface Biomass', fontsize = font_size)
     
     for species in bio_group:
 
-        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,box_number,4:6], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,box_number,4:6], np.nan)
+        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,boxes,4:6], np.nan) # tonnes
+        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,boxes,4:6], np.nan)
         p_oiled = pelagic_oiled.sum(axis=1)
         p_control = pelagic_control.sum(axis=1)
         diff = p_oiled - p_control
@@ -666,22 +419,22 @@ def plot_surface_diff_box(bio_group, scenario, box_number, control, time, start,
     ax.plot(event_start, 0, 'ro', alpha=0.5)
     ax.set_ylim([y_min, y_max])
 
-def plot_bacteria_diff_box(scenario, box_number, control, time, start, end, event_start, y_min=None, y_max=None): #bacteria, plankton
+def difference_between_scenario_and_control_bacteria(scenario, control, time, start, end, boxes, event_start, y_min=None, y_max=None): #bacteria, plankton
 
     fig, ax = plt.subplots(figsize = (14,3))
     ax.tick_params(labelsize=label_size)
     ax.set_ylabel('scenario - control (mg N$^{-3}$)')
-    ax.set_title('Difference in Bacteria Biomass in Salish Sea Atlantis box ' + str(box_number), fontsize = font_size)
+    ax.set_title('Difference in Bacterial Biomass', fontsize = font_size)
 
     for species in bacteria:
         if "pelagic" in species:
-            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,box_number,0:6], np.nan) # tonnes, take only water column layers
-            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,box_number,0:6], np.nan)
+            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,boxes,0:6], np.nan) # tonnes, take only water column layers
+            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,boxes,0:6], np.nan)
             b_oiled = bact_oiled.sum(axis=1)
             b_control = bact_control.sum(axis=1)
         else:
-            b_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,box_number,6], np.nan) # tonnes, take only sediment layer
-            b_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,box_number,6], np.nan)
+            b_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,boxes,6], np.nan) # tonnes, take only sediment layer
+            b_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,boxes,6], np.nan)
         
         diff = b_oiled - b_control
         ax.plot(time[start:end], diff,linewidth = 2)
@@ -692,142 +445,52 @@ def plot_bacteria_diff_box(scenario, box_number, control, time, start, end, even
     ax.plot(event_start, 0, 'ro', alpha=0.5)
     ax.set_ylim([y_min, y_max])
 
-def plot_bacteria_diff(scenario, control, time, start, end, event_start, y_min=None, y_max=None): #bacteria, plankton
-
-    fig, ax = plt.subplots(figsize = (14,3))
-    ax.tick_params(labelsize=label_size)
-    ax.set_ylabel('scenario - control (mg N$^{-3}$)')
-    ax.set_title('Difference in Bacteria Biomass in Salish Sea Atlantis', fontsize = font_size)
-
-    for species in bacteria:
-        if "pelagic" in species:
-            bact_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,:,0:6], np.nan) # tonnes, take only water column layers
-            bact_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,:,0:6], np.nan)
-            b_oiled = bact_oiled.sum(axis=2)
-            b_control = bact_control.sum(axis=2)
-            b_oiled = b_oiled.sum(axis=1)
-            b_control = b_control.sum(axis=1)
-        else:
-            b_oiled = np.ma.filled(scenario.variables[bacteria[species] + '_N'][start:end,:,6], np.nan) # tonnes, take only sediment layer
-            b_control = np.ma.filled(control.variables[bacteria[species] + '_N'][start:end,:,6], np.nan)
-            b_oiled = bact_oiled.sum(axis=1)
-            b_control = bact_control.sum(axis=1)
-        
-        diff = b_oiled - b_control
-        ax.plot(time[start:end], diff,linewidth = 2)
-    
-    c_diff = b_control - b_control
-    ax.legend(bacteria, loc='center left')
-    ax.plot(time[start:end], c_diff, 'k',linewidth = 2)
-    ax.plot(event_start, 0, 'ro', alpha=0.5)
-    ax.set_ylim([y_min, y_max])
-
-def plot_pelagic_diff(bio_group, scenario, control, time, start, end, event_start, y_min=None, y_max=None):
-
-    fig, ax = plt.subplots(figsize = (14,3))
-    ax.tick_params(labelsize=label_size)
-    ax.set_ylabel('scenario - control (mg N$^{-3}$)')
-    ax.set_title('Difference in Pelagic Biomass in Salish Sea Atlantis', fontsize = font_size)
-
-    for species in bio_group:
-        
-        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,:,0:6], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,:,0:6], np.nan)
-        p_oiled = pelagic_oiled.sum(axis=1)
-        p_control = pelagic_control.sum(axis=1)
-        p_oiled = p_oiled.sum(axis=1)
-        p_control = p_control.sum(axis=1)
-        diff = p_oiled - p_control
-        ax.plot(time[start:end], diff,linewidth = 2)
-
-    cdiff = p_control - p_control
-    ax.legend(bio_group, loc='center left')
-    ax.plot(time[start:end], cdiff, 'k',linewidth = 2)
-    ax.plot(event_start, 0, 'ro', alpha=0.5)
-    ax.set_ylim([y_min, y_max])
-
-def plot_benthic_diff(bio_group, scenario, control, time, start, end, event_start, y_min=None, y_max=None): 
-
-    fig, ax = plt.subplots(figsize = (14,3))
-    ax.tick_params(labelsize=label_size)
-    ax.set_ylabel('scenario - control (mg N$^{-3}$)')
-    ax.set_title('Difference in Benthic Biomass in Salish Sea Atlantis', fontsize = font_size)
-
-    for species in bio_group:
-        
-        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,:], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,:], np.nan)
-        p_oiled = pelagic_oiled.sum(axis=1)
-        p_control = pelagic_control.sum(axis=1)
-        diff = p_oiled - p_control
-        ax.plot(time[start:end], diff, linewidth = 2)
-
-    cdiff = p_control - p_control
-    ax.legend(bio_group, loc='center left')    
-    ax.plot(time[start:end], cdiff, 'k',linewidth = 2)
-    ax.plot(event_start, 0, 'ro', alpha=0.5)
-    ax.set_ylim([y_min, y_max])
-
-def plot_sediment_diff(bio_group, scenario, control, time, start, end, event_start, y_min=None, y_max=None): 
-
-    fig, ax = plt.subplots(figsize = (14,3))
-    ax.tick_params(labelsize=label_size)
-    ax.set_ylabel('scenario - control (mg N$^{-3}$)')
-    ax.set_title('Difference in Sediment Biomass in Salish Sea Atlantis', fontsize = font_size)
-
-    for species in bio_group:
-        
-        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,:,6], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,:,6], np.nan)
-        p_oiled = pelagic_oiled.sum(axis=1)
-        p_control = pelagic_control.sum(axis=1)
-        diff = p_oiled - p_control
-        ax.plot(time[start:end], diff, linewidth = 2)
-    
-    cdiff = p_control - p_control
-    ax.legend(bio_group, loc='center left')    
-    ax.plot(time[start:end], cdiff, 'k',linewidth = 2)
-    ax.plot(event_start, 0, 'ro', alpha=0.5)
-    ax.set_ylim([y_min, y_max]);
-
-def plot_surface_diff(bio_group, scenario, control, time, start, end, event_start, y_min=None, y_max=None): 
-
-    fig, ax = plt.subplots(figsize = (14,3))
-    ax.tick_params(labelsize=label_size)
-    ax.set_ylabel('scenario - control (mg N$^{-3}$)')
-    ax.set_title('Difference Surface Biomass in Salish Sea Atlantis', fontsize = font_size)
-
-    for species in bio_group:
-
-        pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,:,4:6], np.nan) # tonnes
-        pelagic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,:,4:6], np.nan)
-        p_oiled = pelagic_oiled.sum(axis=1)
-        p_control = pelagic_control.sum(axis=1)
-        p_oiled = p_oiled.sum(axis=1)
-        p_control = p_control.sum(axis=1)
-        diff = p_oiled - p_control
-        ax.plot(time[start:end], diff,linewidth = 2)
-    
-    cdiff = p_control - p_control
-    ax.legend(bio_group, loc='center left')    
-    ax.plot(time[start:end], cdiff, 'k',linewidth = 2)
-    ax.plot(event_start, 0, 'ro', alpha=0.5)
-    ax.set_ylim([y_min, y_max]);
-
-def compare_pah(pah, scenarios, time, start, end, event_start): 
+def compare_one_pah_concentration_across_scenarios(pah, scenarios, time, start, end, boxes, event_start): 
 
     fig, ax = plt.subplots(figsize = (14,3))
     ax.plot(event_start, 0, 'ro', alpha=0.5)
 
     for scenario in scenarios:
-        Phe = np.ma.filled(scenario.variables[pah][start:end,:], np.nan)
-        Phe = Phe.sum(axis=2)
-        Phe = Phe.sum(axis=1)
-        ax.plot(time[start:end], Phe) 
+        contaminant = np.ma.filled(scenario.variables[pah][start:end,boxes,:], np.nan)
+        contaminant = contaminant.sum(axis=2)
+        contaminant = contaminant.sum(axis=1)
+        ax.plot(time[start:end], contaminant) 
     
-    ax.set_title('Concentration of ' + pah + ' in Salish Sea Atlantis', fontsize = font_size)
+    ax.set_title('Concentration of ' + pah, fontsize = font_size)
     ax.set_ylabel('mg PAH m$^{-3}$')
     ax.legend(['Release start','scenario 1', 'scenario 2', 'scenario 3', 'scenario 4'], loc='best');
+
+def all_pah_mass(scenarios, times, boxes, scenario_labels):
+
+    for scenario, label in zip(scenarios, scenario_labels):
+        fig, ax = plt.subplots(figsize = (14,3))
+        for pah in pahs:
+            contam_tbl = np.ma.filled(scenario.variables[pah][:,boxes,:], np.nan)
+            volume_tbl = np.ma.filled(scenario.volume[:,boxes,:], np.nan)
+            contam_mass_tbl = contam_tbl * volume_tbl
+            contam_mass_tb = contam_mass_tbl.sum(axis=2)
+            contam_mass_t = contam_mass_tb.sum(axis=1)
+
+            ax.plot(times, contam_mass_t[0:times.size])
+        ax.legend(pahs)
+        ax.set_ylabel('mg PAH')
+        ax.set_title(label)
+
+def compare_one_pah_mass_across_scenarios(pah, scenarios, times, boxes, event_start, scenario_labels):
+
+    fig, ax = plt.subplots(figsize = (14,3))
+    ax.plot(event_start, 0, 'ro', alpha=0.5)
+
+    for scenario in scenarios:
+        contaminant_time_box_layer = np.ma.filled(scenario.variables[pah][:,boxes,:], np.nan)
+        volume_time_box_layer = np.ma.filled(scenario.volume[:,boxes,:], np.nan)
+        mass_time_box_layer = contaminant_time_box_layer * volume_time_box_layer
+        mass_time_box = mass_time_box_layer.sum(axis=2)
+        mass_time = mass_time_box.sum(axis=1)
+        ax.plot(times, mass_time[0:times.size])
+    ax.set_title('Mass of ' + pah, fontsize = font_size)
+    ax.set_ylabel('mg ' + str(pah))
+    ax.legend(['Release start', scenario_labels], loc='best');
 
 def compare_pelagic_pah_in_bio(bio_group, scenarios, pah, time, start, end, event_start):
 
@@ -857,6 +520,37 @@ def compare_pelagic_pah_in_bio(bio_group, scenarios, pah, time, start, end, even
         ax.plot(event_start, 0, 'ro', alpha=0.5)
         ax.legend(['scenario 1', 'scenario 2', 'scenario 3', 'scenario 4']);
 
+def compare_pah_mass_in_bio_tissue_across_scenarios(group, pah, scenarios, time, boxes, scenario_names):
+
+    fig = plt.figure(figsize=(18, 18), facecolor='white')
+    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
+
+    for species in group:
+        
+        bio_index = (list(group).index(species))
+
+        if bio_index < 3:
+            position = 0, bio_index
+        elif bio_index > 5: 
+            position = 2, bio_index-6
+        else :
+            position = 1, bio_index-3
+
+        ax = fig.add_subplot(gs[position])
+
+        for scenario in scenarios:
+
+            oil_time_box_layer = np.ma.filled(scenario.variables[group[species] + '_' + pah][:,boxes,0:6], np.nan) # mgPAH / m3
+            volume_time_box_layer = np.ma.filled(scenario.variables['volume'][:,boxes,0:6], np.nan) #m3
+            oil_mass_time_box_layer = oil_time_box_layer * volume_time_box_layer
+            oil_mass_time_box = oil_mass_time_box_layer.sum(axis=2) 
+            oil_mass_time = oil_mass_time_box.sum(axis=1) 
+            ax.plot(time, oil_mass_time[0:time.size],linewidth = 2, alpha=0.5) #semilogy
+        
+        plt.ylabel('mg '+str(pah)+' inside '+str(species), fontsize=12)
+        ax.set_title(species)
+    ax.legend(scenario_names, bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12);
+
 def compare_pelagic_pah_in_bio_box(bio_group, scenarios, box_number, pah, time, start, end, event_start):
 
     for species in bio_group:
@@ -870,101 +564,101 @@ def compare_pelagic_pah_in_bio_box(bio_group, scenarios, box_number, pah, time, 
         ax.plot(event_start, 0, 'ro', alpha=0.5)
         ax.legend(['scenario 1', 'scenario 2', 'scenario 3', 'scenario 4']);
 
-def boxplot_pelagic(bio_group, scenario, control, start, boxes, days, data_labels, x_lim=None, bio_colours=['#063764','#0b5394','#3d85c6','#6fa8dc','#9fc5e8']): #bacteria, plankton
+def boxplot_pelagic(bio_group, scenarios, control, start, end_days, boxes, data_labels, scenario_labels, x_lim=None, bio_colours=['#063764','#0b5394','#3d85c6','#6fa8dc','#9fc5e8']): #bacteria, plankton
     
-    df = pd.DataFrame(data_labels)
-    spp = []
+    for scenario, name in zip(scenarios, scenario_labels):
+        df = pd.DataFrame(data_labels)
+        spp = []
+        sensitivity_results = []
     
-    for species in bio_group:
-        results = list()
-        for day in days:
-            p_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:day,boxes,0:6], np.nan) # tonnes, take only water column layers
-            p_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:day,boxes,0:6], np.nan)
-            p_oiled = p_oiled.sum(axis=0)
-            p_oiled = p_oiled.sum(axis=0)
-            p_oiled = p_oiled.sum(axis=0)
-            p_control = p_control.sum(axis=0)
-            p_control = p_control.sum(axis=0)
-            p_control = p_control.sum(axis=0)
-            ratio = (p_oiled/p_control-1)*100
-            results.append(ratio)
-        spp.append(bio_group[species])
-        df.loc[len(df.index)] = results
-    df['bio_group'] = spp
-    df1 = df.set_index('bio_group')
+        for species in bio_group:
+            results = list()
+            for day in end_days:
+                p_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:day,boxes,0:6], np.nan) # tonnes, take only water column layers
+                p_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:day,boxes,0:6], np.nan)
+                p_oiled = p_oiled.sum(axis=0)
+                p_oiled = p_oiled.sum(axis=0)
+                p_oiled = p_oiled.sum(axis=0)
+                p_control = p_control.sum(axis=0)
+                p_control = p_control.sum(axis=0)
+                p_control = p_control.sum(axis=0)
+                ratio = (p_oiled/p_control-1)*100
+                results.append(ratio)
+            spp.append(bio_group[species])
+            sensitivity_results.append(sensitivity[species])
+            df.loc[len(df.index)] = results
+        df['bio_group'] = spp
+        df['sensitivity'] = sensitivity_results
+        df1 = df.set_index('bio_group')
 
-    df1.plot(kind="barh", subplots=True, layout=(1,len(days)), figsize=(15,4), sharey=True, sharex=True, color=bio_colours, legend=None,
-         xlabel='Pelagic Groups', ylabel=None, title='Percent (%) Change Relative to Control for Select Pelagic Groups', xlim=x_lim); 
-
-def boxplot_pelagic_all(bio_group, scenarios, control, boxes, days, data_labels, x_lim=None): #bacteria, plankton
+        df1.plot(kind="barh", subplots=True, layout=(1,len(end_days)+1), title=name, figsize=(15,4), sharey=True, sharex=True, color=bio_colours, legend=None,
+            xlabel='Pelagic groups', ylabel=None, xlim=x_lim);
     
-    for item in scenarios:
-        boxplot_pelagic(bio_group, item, control, boxes, days, data_labels, x_lim=None)
+def boxplot_benthic(bio_group, scenarios, control, start, end_days, boxes, data_labels, scenario_labels, x_lim=None, bio_colours=['#783f04','#b45f06','#e69138','#f6b26b','#f9cb9c']): 
+
+    for scenario, name in zip(scenarios, scenario_labels):
+        df = pd.DataFrame(data_labels)
+        spp = []
+        sensitivity_results = []
+
+        for species in bio_group:
+            results = list()
+            for day in end_days:
+                p_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:day,boxes], np.nan) # tonnes, take only water column layers
+                p_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:day,boxes], np.nan)
+                p_oiled = p_oiled.sum(axis=0)
+                p_oiled = p_oiled.sum(axis=0)
+                p_control = p_control.sum(axis=0)
+                p_control = p_control.sum(axis=0)
+                ratio = (p_oiled/p_control-1)*100
+                results.append(ratio)
+            spp.append(bio_group[species])
+            sensitivity_results.append(sensitivity[species])
+            df.loc[len(df.index)] = results
+        df['bio_group'] = spp
+        df['sensitivity'] = sensitivity_results
+        df1 = df.set_index('bio_group')
+
+        df1.plot(kind="barh", subplots=True, layout=(1,len(end_days)+1), figsize=(15,6), title=name, sharey=True, sharex=True, color=bio_colours, legend=None,
+            xlabel='Benthic groups', ylabel=None, xlim=x_lim);
+
+def boxplot_sediment(bio_group, scenarios, control, start, end_days, boxes, data_labels, scenario_labels, x_lim=None, bio_colours=['#783f04','#b45f06','#e69138','#f6b26b','#f9cb9c']):
     
-
-def boxplot_benthic(bio_group, scenario, control, start, boxes, days, data_labels, x_lim=None, bio_colours=['#783f04','#b45f06','#e69138','#f6b26b','#f9cb9c']): 
-
-    df = pd.DataFrame(data_labels)
-    spp = []
-
-    for species in bio_group:
-        results = list()
-        for day in days:
-            p_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:day,boxes], np.nan) # tonnes, take only water column layers
-            p_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:day,boxes], np.nan)
-            p_oiled = p_oiled.sum(axis=0)
-            p_oiled = p_oiled.sum(axis=0)
-            p_control = p_control.sum(axis=0)
-            p_control = p_control.sum(axis=0)
-            ratio = (p_oiled/p_control-1)*100
-            results.append(ratio)
-        spp.append(bio_group[species])
-        df.loc[len(df.index)] = results
-    df['bio_group'] = spp
-    df1 = df.set_index('bio_group')
-
-    df1.plot(kind="barh", subplots=True, layout=(1,len(days)), figsize=(15,6), sharey=True, sharex=True, color=bio_colours, legend=None,
-         xlabel='Benthic Groups', ylabel=None, title='Percent (%) Change Relative to Control for Select Benthic Groups', xlim=x_lim);
-
-def boxplot_benthic_all(bio_group, scenarios, control, boxes, days, data_labels, x_lim=None): #bacteria, plankton
+    for scenario, name in zip(scenarios, scenario_labels):
+        df = pd.DataFrame(data_labels)
+        spp = []
+        sensitivity_results = []
     
-    for item in scenarios:
-        boxplot_benthic(bio_group, item, control, boxes, days, data_labels, x_lim=None)
+        for species in bio_group:
+            results = list()
+            for day in end_days:
+                p_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:day,boxes,6], np.nan) # tonnes, only sediment layers
+                p_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:day,boxes,6], np.nan)
+                p_oiled = p_oiled.sum(axis=0)
+                p_oiled = p_oiled.sum(axis=0)
+                p_control = p_control.sum(axis=0)
+                p_control = p_control.sum(axis=0)
+                ratio = (p_oiled/p_control-1)*100
+                results.append(ratio)
+            spp.append(bio_group[species])
+            sensitivity_results.append(sensitivity[species])
+            df.loc[len(df.index)] = results
+        df['bio_group'] = spp
+        df['sensitivity'] = sensitivity_results
+        df1 = df.set_index('bio_group')
 
-def boxplot_sediment(bio_group, scenario, control, boxes, days, data_labels, x_lim=None, bio_colours=['#783f04','#b45f06','#e69138','#f6b26b','#f9cb9c']):
-    
-    df = pd.DataFrame(data_labels)
-    spp = []
-    
-    for species in bio_group:
-        results = list()
-        for day in days:
-            p_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][day,boxes,6], np.nan) # tonnes, only sediment layers
-            p_control = np.ma.filled(control.variables[bio_group[species] + '_N'][day,boxes,6], np.nan)
-            p_oiled = p_oiled.sum(axis=0)
-            p_control = p_control.sum(axis=0)
-            ratio = (p_oiled/p_control-1)*100
-            results.append(ratio)
-        spp.append(bio_group[species])
-        df.loc[len(df.index)] = results
-    df['bio_group'] = spp
-    df1 = df.set_index('bio_group')
+        df1.plot(kind="barh", subplots=True, layout=(1,len(end_days)+1), figsize=(15,4), title=name, sharey=True, sharex=True, color=bio_colours, legend=None,
+            xlabel='Groups in the sediment layer', ylabel=None, xlim=x_lim); 
 
-    df1.plot(kind="barh", subplots=True, layout=(1,len(days)), figsize=(15,4), sharey=True, sharex=True, color=bio_colours, legend=None,
-         xlabel='Pelagic Groups', ylabel=None, title='Percent (%) Change Relative to Control for Select Sedimentary Groups', xlim=x_lim); 
-
-def boxplot_sediment_all(bio_group, scenarios, control, boxes, days, data_labels, x_lim=None):
-    
-    for item in scenarios:
-        boxplot_sediment(bio_group, item, control, boxes, days, data_labels, x_lim=None)
-
-def compare_scenarios_benthic_N(bio_group, scenarios, control, time, start, end, boxes, y_min=None, y_max=None): # benthos, shellfish
+def compare_scenarios_benthic_N(bio_group, scenarios, control, time, start, end, boxes, scenario_paths, y_min=None, y_max=None): # benthos, shellfish
 
     # Plot variables
     fig = plt.figure(figsize=(18, 18), facecolor='white')
     gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
 
     for species in bio_group:
+        names = ['control']
+
         bio_index = (list(bio_group).index(species))
 
         if bio_index < 3:
@@ -981,22 +675,27 @@ def compare_scenarios_benthic_N(bio_group, scenarios, control, time, start, end,
         control_ratio = (benthic_control / benthic_control-1)*100
         ax.plot(time[start:end], control_ratio, 'k', linewidth = 2)
 
-        for scenario in scenarios:
+        for scenario, path in zip(scenarios, scenario_paths):
+
+            names.append(path.parent.stem)
+
             benthic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,boxes], np.nan) # tonnes
             ratio = (benthic_oiled.sum(axis=1) / benthic_control-1)*100 
             ax.plot(time[start:end], ratio, linewidth = 2)
         
         plt.ylabel('Percent (%) change', fontsize=12)
-        ax.legend(['control', 'scenario 1', 'scenario 2', 'scenario 3', 'scenario 4'])
         ax.set_title(species)
-        ax.set_ylim([y_min, y_max]);
+        ax.set_ylim([y_min, y_max])
+    ax.legend(names);
 
-def compare_scenarios_pelagic_N(bio_group, scenario_paths, control, time, start, end, boxes, y_min=None, y_max=None): #bacteria, plankton, sharks, birds, mammals, named_fish, salmon, fish, benth_feeders
+def compare_scenarios_pelagic_N(bio_group, scenarios, control, time, start, end, boxes, scenario_paths, y_min=None, y_max=None): #bacteria, plankton, sharks, birds, mammals, named_fish, salmon, fish, benth_feeders
 
     fig = plt.figure(figsize=(18, 18), facecolor='white')
     gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
 
     for species in bio_group:
+
+        names = ['control']
         
         bio_index = (list(bio_group).index(species))
 
@@ -1015,8 +714,10 @@ def compare_scenarios_pelagic_N(bio_group, scenario_paths, control, time, start,
         control_ratio = (pelagic_control / pelagic_control-1)*100
         ax.plot(time[start:end], control_ratio, 'k', linewidth = 2)
     
-        for path in scenario_paths:
-            scenario = xr.open_dataset(str(path), decode_cf=True)
+        for scenario, path in zip(scenarios, scenario_paths):
+            
+            names.append(path.parent.stem)
+            
             pelagic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,boxes,0:6], np.nan) # tonnes
             pelagic_oiled = pelagic_oiled.sum(axis=2) 
             pelagic_oiled = pelagic_oiled.sum(axis=1) 
@@ -1024,9 +725,47 @@ def compare_scenarios_pelagic_N(bio_group, scenario_paths, control, time, start,
             ax.plot(time[start:end], ratio, linewidth = 2)
        
         plt.ylabel('Percent (%) change', fontsize=12)
-        ax.legend(['control', 'scenario 1', 'scenario 2', 'scenario 3', 'scenario 4'])
         ax.set_title(species)
-        ax.set_ylim([y_min, y_max]);
+        ax.set_ylim([y_min, y_max])
+    ax.legend(names);
+    
+def compare_scenarios_sediment_N(bio_group, scenarios, control, time, start, end, boxes, scenario_paths, y_min=None, y_max=None): # benthos, shellfish
+
+    fig = plt.figure(figsize=(18, 18), facecolor='white')
+    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
+
+    for species in bio_group:
+
+        names = ['control']
+
+        bio_index = (list(bio_group).index(species))
+
+        if bio_index < 3:
+            position = 0, bio_index
+        elif bio_index > 5: 
+            position = 2, bio_index-6
+        else :
+            position = 1, bio_index-3
+
+        ax = fig.add_subplot(gs[position])
+
+        benthic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,boxes,6], np.nan)
+        benthic_control = benthic_control.sum(axis=1)
+        control_ratio = (benthic_control  / benthic_control-1)*100
+        ax.plot(time[start:end], control_ratio, 'k', linewidth = 2)
+
+        for scenario, path in zip(scenarios, scenario_paths):
+
+            names.append(path.parent.stem)
+
+            benthic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,boxes,6], np.nan) # tonnes
+            ratio = (benthic_oiled.sum(axis=1) / benthic_control-1)*100 
+            ax.plot(time[start:end], ratio, linewidth = 2)
+       
+        plt.ylabel('Percent (%) change', fontsize=12)
+        ax.set_title(species)
+        ax.set_ylim([y_min, y_max])
+    ax.legend(names);
 
 def compare_scenarios_pelagic_parameter(parameter_group, scenarios, control, time, start, end, boxes, y_min=None, y_max=None): # for use with any parameter that does not require _N
 
@@ -1096,38 +835,6 @@ def compare_scenarios_sediment_parameter(parameter_group, scenarios, control, ti
         plt.ylabel('Percent (%) change', fontsize=12)
         ax.legend(['control', 'scenario 1', 'scenario 2', 'scenario 3', 'scenario 4'])
         ax.set_title(parameter)
-        ax.set_ylim([y_min, y_max]);
-
-def compare_scenarios_sediment_N(bio_group, scenarios, control, time, start, end, boxes, y_min=None, y_max=None): # benthos, shellfish
-
-    fig = plt.figure(figsize=(18, 18), facecolor='white')
-    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
-
-    for species in bio_group:
-        bio_index = (list(bio_group).index(species))
-
-        if bio_index < 3:
-            position = 0, bio_index
-        elif bio_index > 5: 
-            position = 2, bio_index-6
-        else :
-            position = 1, bio_index-3
-
-        ax = fig.add_subplot(gs[position])
-
-        benthic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,boxes,6], np.nan)
-        benthic_control = benthic_control.sum(axis=1)
-        control_ratio = (benthic_control  / benthic_control-1)*100
-        ax.plot(time[start:end], control_ratio, 'k', linewidth = 2)
-
-        for scenario in scenarios:
-            benthic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,boxes,6], np.nan) # tonnes
-            ratio = (benthic_oiled.sum(axis=1) / benthic_control-1)*100 
-            ax.plot(time[start:end], ratio, linewidth = 2)
-       
-        plt.ylabel('Percent (%) change', fontsize=12)
-        ax.legend(['control', 'scenario 1', 'scenario 2', 'scenario 3'])
-        ax.set_title(species)
         ax.set_ylim([y_min, y_max]);
 
 def map_variable_aggregate_time(variable_name, scenarios, v_max=None, v_min=None, _cmap=cm.Purples):

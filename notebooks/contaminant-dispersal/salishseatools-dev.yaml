@@ -23,6 +23,7 @@ dependencies:
 - cmocean
 - coverage
 - f90nml
+- geopandas
 - gsw
 - ipdb
 - ipython
