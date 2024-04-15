@@ -29,15 +29,15 @@ from util.seed_particles import get_particles, get_release_times
 
 # %%
 # Spill release times (years 2019 and 2020 only)
-release_start_time = '2020-01-16' 
-release_end_time = '2020-01-17'
-release_YYYY = '2020-01'
+release_start_time = '2020-07-20' 
+release_end_time = '2020-07-21'
+release_YYYY = '2020-07'
 
 # %% [markdown]
 # Select the location of interest, which is specified by a shapefile.
 
 # %%
-scenario = "5b_TurnPoint_Dilbit"
+scenario = "4a_ActivePass_Diesel"
 
 # %%
 #Kernels
