@@ -37,7 +37,7 @@ release_YYYY = '2019-07'
 # Select the location of interest, which is specified by a shapefile.
 
 # %%
-scenario = "4a_ActivePass_Diesel"
+scenario = "6a_VancouverHarbour_BunkerC"
 
 # %%
 #Kernels
