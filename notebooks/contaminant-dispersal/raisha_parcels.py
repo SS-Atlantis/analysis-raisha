@@ -29,8 +29,8 @@ from util.seed_particles import get_particles, get_release_times
 
 # %%
 # Spill release times (years 2019 and 2020 only)
-release_start_time = '2020-07-13' 
-release_end_time = '2020-07-14'
+release_start_time = '2020-07-21' 
+release_end_time = '2020-07-22'
 release_YYYY = '2020-07'
 
 # %% [markdown]
