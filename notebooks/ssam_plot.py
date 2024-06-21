@@ -454,7 +454,7 @@ def diff_scenario_control_bacteria(scenario, control, time, start, end, boxes, e
     ax.plot(event_start, 0, 'ro', alpha=0.5)
     ax.set_ylim([y_min, y_max])
 
-def plot_group_mass(group, scenario_datasets, scenario_paths):
+def group_mass(group, scenario_datasets, scenario_paths):
     for scenario, path in zip(scenario_datasets, scenario_paths):
         fig, ax = plt.subplots(figsize = (14,3))
         nm = path.parent.stem
@@ -471,7 +471,7 @@ def plot_group_mass(group, scenario_datasets, scenario_paths):
         ax.set_xlabel('Time')
         ax.set_title(nm)
 
-def plot_group_conc(group, scenario_datasets, scenario_paths):
+def group_conc(group, scenario_datasets, scenario_paths):
     for scenario, path in zip(scenario_datasets, scenario_paths):
         fig, ax = plt.subplots(figsize = (14,3))
         nm = path.parent.stem
@@ -486,7 +486,7 @@ def plot_group_conc(group, scenario_datasets, scenario_paths):
         ax.set_xlabel('Time')
         ax.set_title(nm)
 
-def plot_group_nums(group, scenario_datasets, scenario_paths):
+def group_nums(group, scenario_datasets, scenario_paths):
     for scenario, path in zip(scenario_datasets, scenario_paths):
         fig, ax = plt.subplots(figsize = (14,3))
         nm = path.parent.stem
