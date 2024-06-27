@@ -95,6 +95,14 @@ def beaching(particle, fieldset, time):
         else:
             particle.beached = 0
 
+def export(particle,fieldset,time):
+    deg2met = 111319.5
+    if 'Correct cell not found after 1000000 iterations': #particle.state == StatusCode.ErrorOutOfBounds: 
+        test =  -particle.lat*0.84120957 -83.98027258 #Checking if particle gets too close to boundary JdF
+        if particle.lon<test:
+            print(f'Particle {particle.id} lost through JdF [{particle.time}, {particle.depth}, {particle.lat}, {particle.lon}]')
+            particle.delete()
+
 def DeleteParticle(particle, fieldset, time):
     """Delete particle from OceanParcels simulation to avoid run failure
     """
@@ -219,9 +227,10 @@ pset = get_particles(fieldset, num_particles, input_shapefile_name, MyParticle, 
 decay_kernel = pset.Kernel(DecayParticle)
 beaching_kernel = pset.Kernel(beaching)
 ForcingWind_kernel = pset.Kernel(WindAdvectionRK4)
+export_atJdF = pset.Kernel(export)
 
 # Adding to the main kernel
-my_kernel =  AdvectionRK4 + decay_kernel + ForcingWind_kernel + beaching_kernel
+my_kernel =  AdvectionRK4 + decay_kernel + ForcingWind_kernel + beaching_kernel + export_atJdF
 
 output_file_name = scenario + '_' + str(release_start_time) +  '_' + str(num_particles_per_day)+ '_OP_D50_wp3.zarr'
 print(output_file_name)
