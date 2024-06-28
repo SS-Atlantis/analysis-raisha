@@ -98,7 +98,7 @@ def beaching(particle, fieldset, time):
 def export(particle,fieldset,time):
     deg2met = 111319.5
     if 'Correct cell not found after 1000000 iterations': #particle.state == StatusCode.ErrorOutOfBounds: 
-        test =  -particle.lat*0.84120957 -83.98027258 #Checking if particle gets too close to boundary JdF
+        test =  -124.7200 #Checking if particle gets too close to boundary JdF (enters box 0)
         if particle.lon<test:
             print(f'Particle {particle.id} lost through JdF [{particle.time}, {particle.depth}, {particle.lat}, {particle.lon}]')
             particle.delete()
