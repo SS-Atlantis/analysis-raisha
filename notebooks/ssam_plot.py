@@ -5,6 +5,8 @@ import pandas as pd
 import xarray as xr
 import geopandas as gpd
 import matplotlib.cm as cm
+import ssam_groups as groups
+from ssam_groups import conditions
 from ssam_groups import cohorts
 from ssam_groups import bacteria
 from ssam_groups import pahs
@@ -41,6 +43,63 @@ def compare_groups_pelagic(bio_group, scenario, control, time, start, end, boxes
     ax.plot(event_start, 1, 'ro', alpha=0.5)
     ax.set_ylim([y_min, y_max])
     #ax.plot([spill_end, spill_end], [y_min, y_max], 'r',alpha=0.1)
+
+def compare_pelagic_N_scenarios(group, scenario_datasets,scenario_paths,control,start,end,location=groups.salish_sea,pick=2, y_min=None, y_max=None): #bacteria, plankton, sharks, birds, mammals, named_fish, salmon, fish, benth_feeders
+
+    fig = plt.figure(figsize=(18, 18), facecolor='white')
+    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
+
+    for species in group:
+        
+        names = ['control']
+
+        bio_index = (list(group).index(species))
+
+        if bio_index < 3:
+            position = 0, bio_index
+        elif bio_index > 5: 
+            position = 2, bio_index-6
+        else :
+            position = 1, bio_index-3
+
+        ax = fig.add_subplot(gs[position])
+
+        pelagic_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,location,:], np.NaN)
+        pelagic_control = pelagic_control.sum(axis=2)
+        pelagic_control = pelagic_control.sum(axis=1)
+        control_ratio = (pelagic_control / pelagic_control-1)*100
+        ax.plot(control.t[start:end], control_ratio, '.k', linewidth = 2)
+
+        for scenario, path in zip(scenario_datasets,scenario_paths):
+            nm = str(path.parent.stem).split(sep = '_')
+            names.append(conditions[str(nm[pick])])
+
+            # if "-01-" in nm[7]:
+            #     line_colour = '#1f77b4'
+            # elif "-04-" in nm[7]:
+            #     line_colour = '#2ca02c'
+            # elif "-07-" in nm[7]:
+            #     line_colour = '#fd8d3d'
+            # else:
+            #     line_colour = '#8b564c'
+
+            # if "2019-" in nm[7]:
+            #     line_type = '--'
+            # else: 
+            #     line_type = 'solid'
+
+            #scenario = xr.open_dataset(str(path), decode_cf=True) 
+            #scenario = original_scenario.resample(t='2Y').mean()
+            pelagic_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,location,:], np.NaN) # tonnes
+            pelagic_oiled = pelagic_oiled.sum(axis=2) 
+            pelagic_oiled = pelagic_oiled.sum(axis=1) 
+            ratio = (pelagic_oiled / pelagic_control-1)*100
+            ax.plot(scenario.t[start:end], ratio, linewidth = 2) #semilogy color = line_colour, linestyle = line_type, 
+
+        plt.ylabel('Percent (%) change', fontsize=12)
+        ax.set_title(species)
+        ax.set_ylim([y_min, y_max])
+    ax.legend(names, bbox_to_anchor=(1.05, 1), fontsize=12); #loc='upper left', 
 
 def compare_groups_benthic(bio_group, scenario, control, time, start, end, boxes, event_start, y_min=None, y_max=None):
 
@@ -109,10 +168,10 @@ def compare_cohorts(bio_group, scenario, control, time, start, end, boxes, event
 
     for species in bio_group:
 
-        fig, ax = plt.subplots(3,1, figsize = (14,9), sharex='all')
+        fig, ax = plt.subplots(2,1, figsize = (14,9), sharex='all')
         ax[0].plot(event_start, 0, 'ok')
         ax[1].plot(event_start,0, 'ok')
-        ax[2].plot(event_start, 0, 'ok')
+        ax[2].plot(event_start,0, 'ok')
 
         numCohorts = cohorts[bio_group[species]]
 
@@ -128,32 +187,31 @@ def compare_cohorts(bio_group, scenario, control, time, start, end, boxes, event
             c_structuralN_tbl = np.ma.filled(control.variables[new_species +'_StructN'][start:end,boxes,:], np.nan)
             c_reservedN_tbl = np.ma.filled(control.variables[new_species +'_ResN'][start:end,boxes,:], np.nan)
 
-            o_numbers_tb = o_numbers_tbl.sum(axis=2)
-            o_structuralN_tb = o_structuralN_tbl.sum(axis=2)
-            o_reservedN_tb = o_reservedN_tbl.sum(axis=2)
+            o_weightatage_tbl = (o_structuralN_tbl + o_reservedN_tbl * o_numbers_tbl) *20*5.7*(3.65/2.65)/1000000
+            o_weightatage_tb = o_weightatage_tbl.sum(axis=2)
+            o_weightatage_t = o_weightatage_tb.sum(axis=1)
 
-            c_numbers_tb = c_numbers_tbl.sum(axis=2)
-            c_structuralN_tb = c_structuralN_tbl.sum(axis=2)
-            c_reservedN_tb = c_reservedN_tbl.sum(axis=2)
+            c_weightatage_tbl = (c_structuralN_tbl + c_reservedN_tbl * c_numbers_tbl) *20*5.7*(3.65/2.65)/1000000
+            c_weightatage_tb = c_weightatage_tbl.sum(axis=2)
+            c_weightatage_t = c_weightatage_tb.sum(axis=1)
 
-            numbers = (o_numbers_tb.sum(axis=1) / c_numbers_tb.sum(axis=1)-1)*100
-            structuralN = (o_structuralN_tb.sum(axis=1) / c_structuralN_tb.sum(axis=1)-1)*100
-            reservedN =(o_reservedN_tb.sum(axis=1) / c_reservedN_tb.sum(axis=1)-1)*100
+            difference = o_weightatage_tb.sum(axis=1) - c_weightatage_tb.sum(axis=1) 
 
-            ax[0].plot(time[start:end], numbers, linewidth = line_width)
-            ax[1].plot(time[start:end], structuralN,linewidth = line_width)
-            ax[2].plot(time[start:end], reservedN,linewidth = line_width)
+            ax[0].plot(time[start:end], o_weightatage_t, linewidth = line_width)
+            ax[1].plot(time[start:end], c_weightatage_t,linewidth = line_width)
+            ax[2].plot(time[start:end], difference,linewidth = line_width)
     
-        ax[0].set_title('Numbers of ' + str(bio_group[species]), fontsize = font_size)
+        ax[0].set_title('Control Biomass of ' + str(bio_group[species]), fontsize = font_size)
+        ax[0].set_ylabel('Tonnes', fontsize = font_size)
         ax[0].tick_params(labelsize=label_size)
         ax[0].legend(['event start','cohort 1','cohort 2','cohort 3','cohort 4','cohort 5','cohort 6','cohort 7','cohort 8','cohort 9','cohort 10',]) #loc='center left'
         
-        ax[1].set_title('Structural Nitrogen (bone size)', fontsize = font_size)
-        ax[1].set_ylabel('Percent (%) Change Relative to Control', fontsize = font_size)
+        ax[1].set_title('Scenario Biomass of ' + str(bio_group[species]), fontsize = font_size)
+        ax[1].set_ylabel('Tonnes', fontsize = font_size)
         ax[1].tick_params(labelsize=label_size);
         
-        ax[2].set_title('Reserve Nitrogen (fatty tissue)', fontsize = font_size)
-        ax[2].set_ylabel('Percent (%) Change Relative to Control', fontsize = font_size)
+        ax[2].set_title('Differences: scenario biomass - control biomass', fontsize = font_size)
+        ax[2].set_ylabel('Tonnes', fontsize = font_size)
         ax[2].tick_params(labelsize=label_size);
         
 def biomass_pelagic(bio_group, scenario, control, time, start, end, boxes, event_start, y_min=None, y_max=None):
@@ -486,6 +544,20 @@ def group_conc(group, scenario_datasets, scenario_paths):
         ax.set_xlabel('Time')
         ax.set_title(nm)
 
+def group_conc_benthic(group, scenario_datasets, scenario_paths):
+    for scenario, path in zip(scenario_datasets, scenario_paths):
+        fig, ax = plt.subplots(figsize = (14,3))
+        nm = path.parent.stem
+        for variable in group:
+            contam_tb = np.ma.filled(scenario.variables[variable], np.nan)
+            time = np.ma.filled(scenario.variables['t'], np.nan)
+            contam_t = contam_tb.sum(axis=1)
+            ax.plot(time, contam_t) #zoom into recruitement of Chinook [40:60]
+        ax.legend(group,  loc='best')
+        ax.set_ylabel('Concentration (mg/m$^2$)')
+        ax.set_xlabel('Time')
+        ax.set_title(nm)
+
 def group_nums(group, scenario_datasets, scenario_paths):
     for scenario, path in zip(scenario_datasets, scenario_paths):
         fig, ax = plt.subplots(figsize = (14,3))
@@ -570,14 +642,14 @@ def boxplot_pelagic(bio_group, scenarios, control, start, end_days, boxes, data_
         for species in bio_group:
             results = list()
             for day in end_days:
-                p_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:day,boxes,0:6], np.nan) # tonnes, take only water column layers
-                p_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:day,boxes,0:6], np.nan)
+                p_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end_days,boxes,0:6], np.nan) # tonnes, take only water column layers
+                p_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end_days,boxes,0:6], np.nan)
                 p_oiled = p_oiled.sum(axis=0)
                 p_oiled = p_oiled.sum(axis=0)
-                p_oiled = p_oiled.sum(axis=0)
+                p_oiled = p_oiled.mean(axis=0)
                 p_control = p_control.sum(axis=0)
                 p_control = p_control.sum(axis=0)
-                p_control = p_control.sum(axis=0)
+                p_control = p_control.mean(axis=0)
                 ratio = (p_oiled/p_control-1)*100
                 results.append(ratio)
             spp.append(bio_group[species])
@@ -646,7 +718,7 @@ def boxplot_sediment(bio_group, scenarios, control, start, end_days, boxes, data
         df1.plot(kind="barh", subplots=True, layout=(1,len(end_days)+1), figsize=(15,4), title=name, sharey=True, sharex=True, color=bio_colours, legend=None,
             xlabel='Groups in the sediment layer', ylabel=None, xlim=x_lim); 
 
-def compare_scenarios_benthic_N(bio_group, scenario_datasets, scenario_paths, control, boxes, time, start, end, y_min=None, y_max=None): # benthos, shellfish
+def compare_scenarios_benthic_N(bio_group, scenario_datasets, scenario_paths, control, start, end, boxes, y_min=None, y_max=None): # benthos, shellfish
 
     # Plot variables
     fig = plt.figure(figsize=(18, 18), facecolor='white')
@@ -667,20 +739,20 @@ def compare_scenarios_benthic_N(bio_group, scenario_datasets, scenario_paths, co
         benthic_control = np.ma.filled(control.variables[bio_group[species] + '_N'][start:end,boxes], np.nan)
         benthic_control = benthic_control.sum(axis=1)
         control_ratio = (benthic_control / benthic_control-1)*100
-        ax.plot(time[start:end], control_ratio, 'k', linewidth = 2)
+        ax.plot(control.t[start:end], control_ratio, 'k', linewidth = 2)
 
         for scenario, path in zip(scenario_datasets, scenario_paths):
             names.append(path.parent.stem)
             benthic_oiled = np.ma.filled(scenario.variables[bio_group[species] + '_N'][start:end,boxes], np.nan) # tonnes
             ratio = (benthic_oiled.sum(axis=1) / benthic_control-1)*100 
-            ax.plot(time[start:end], ratio, linewidth = 2)
+            ax.plot(scenario.t[start:end], ratio, linewidth = 2)
         
         plt.ylabel('Percent (%) change', fontsize=12)
         ax.set_title(species)
         ax.set_ylim([y_min, y_max])
     ax.legend(names);
 
-def compare_scenarios_pelagic_N(bio_group, scenario_datasets, scenario_paths, control, boxes, time, start, end, y_min=None, y_max=None): #bacteria, plankton, sharks, birds, mammals, named_fish, salmon, fish, benth_feeders
+def compare_scenarios_pelagic_N(bio_group, scenario_datasets, scenario_paths, control, boxes, start, end, y_min=None, y_max=None): #bacteria, plankton, sharks, birds, mammals, named_fish, salmon, fish, benth_feeders
 
     fig = plt.figure(figsize=(18, 18), facecolor='white')
     gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
@@ -700,7 +772,7 @@ def compare_scenarios_pelagic_N(bio_group, scenario_datasets, scenario_paths, co
         pelagic_control = pelagic_control.sum(axis=2)
         pelagic_control = pelagic_control.sum(axis=1)
         control_ratio = (pelagic_control / pelagic_control-1)*100
-        ax.plot(time[start:end], control_ratio, 'k', linewidth = 2)
+        ax.plot(control.t[start:end], control_ratio, 'k', linewidth = 2)
     
         for scenario, path in zip(scenario_datasets, scenario_paths):
             names.append(path.parent.stem)
@@ -708,12 +780,12 @@ def compare_scenarios_pelagic_N(bio_group, scenario_datasets, scenario_paths, co
             pelagic_oiled = pelagic_oiled.sum(axis=2) 
             pelagic_oiled = pelagic_oiled.sum(axis=1) 
             ratio = (pelagic_oiled / pelagic_control-1)*100
-            ax.plot(time[start:end], ratio, linewidth = 2)
+            ax.plot(scenario.t[start:end], ratio, linewidth = 2)
        
         plt.ylabel('Percent (%) change', fontsize=12)
         ax.set_title(species)
         ax.set_ylim([y_min, y_max])
-    ax.legend(names);
+    ax.legend(names, bbox_to_anchor=(1.05, 1), fontsize=12); 
     
 def compare_scenarios_sediment_N(bio_group, scenario_datasets, scenario_paths, control, boxes, time, start, end, y_min=None, y_max=None): # benthos, shellfish
 
@@ -823,6 +895,59 @@ def compare_scenarios_sediment_parameter(parameter_group, scenario_datasets, sce
         ax.set_title(parameter)
         ax.set_ylim([y_min, y_max]);
 
+def compare_scenarios_vertebrates(bio_group, scenario_datasets, scenario_paths, control, start, end, location=groups.salish_sea, pick=2, y_min=None, y_max=None): #bacteria, plankton, sharks, birds, mammals, named_fish, salmon, fish, benth_feeders
+
+    fig = plt.figure(figsize=(18, 18), facecolor='white')
+    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
+
+    for species in bio_group:
+        
+        names = ['control']
+
+        bio_index = (list(bio_group).index(species))
+
+        if bio_index < 3:
+            position = 0, bio_index
+        elif bio_index > 5: 
+            position = 2, bio_index-6
+        else :
+            position = 1, bio_index-3
+
+        ax = fig.add_subplot(gs[position])
+
+        new_species = bio_group[species]
+        
+        c_numbers_tbl = control.variables[new_species + '3_Nums'][start:end,location,:]
+        c_structuralN_tbl = control.variables[new_species +'3_StructN'][start:end,location,:]
+        c_reservedN_tbl = control.variables[new_species +'3_ResN'][start:end,location,:]
+
+        c_weightatage_tbl = (c_structuralN_tbl + c_reservedN_tbl * c_numbers_tbl) *20*5.7*(3.65/2.65)/1000000
+        c_weightatage_tb = c_weightatage_tbl.sum(axis=2)
+        c_weightatage_t = c_weightatage_tb.sum(axis=1)
+
+        control_ratio = (c_weightatage_t / c_weightatage_t-1)*100
+        ax.plot(control.t[start:end], control_ratio, 'k', linewidth = 2)
+
+        for scenario, path in zip(scenario_datasets,scenario_paths):
+            nm = str(path.parent.stem).split(sep = '_')
+            names.append(conditions[str(nm[pick])])
+
+            o_numbers_tbl = scenario.variables[new_species + '3_Nums'][start:end,location,:]
+            o_structuralN_tbl = scenario.variables[new_species +'3_StructN'][start:end,location,:]
+            o_reservedN_tbl = scenario.variables[new_species +'3_ResN'][start:end,location,:]
+
+            o_weightatage_tbl = (o_structuralN_tbl + o_reservedN_tbl * o_numbers_tbl) *20*5.7*(3.65/2.65)/1000000
+            o_weightatage_tb = o_weightatage_tbl.sum(axis=2)
+            o_weightatage_t = o_weightatage_tb.sum(axis=1)
+
+            ratio = (o_weightatage_t / c_weightatage_t-1)*100
+            ax.plot(scenario.t[start:end], ratio, linewidth = 2) #semilogy color = line_colour, linestyle = line_type, 
+
+        plt.ylabel('Percent (%) change', fontsize=12)
+        ax.set_title(species)
+        ax.set_ylim([y_min, y_max])
+    ax.legend(names, bbox_to_anchor=(1.05, 1), fontsize=12); #loc='upper left', 
+
 def map_variable_aggregate_time(variable_name, scenario_datasets, scenario_labels, v_max=None, v_min=None, _cmap=cm.Purples):
     
     shapefile_name = "/ocean/rlovindeer/Atlantis/ssam_oceanparcels/SalishSea/SalishSea_July172019_2/SalishSea_July172019.shp"
@@ -864,7 +989,7 @@ def map_variable_aggregate_time(variable_name, scenario_datasets, scenario_label
         land_df.plot(ax=ax, color='white');
         position = position+1
 
-def map_pelagic_aggregate_time(variable_name, scenario_datasets, scenario_labels, control, v_max=100, v_min=-100):
+def map_pelagic_aggregate_time(variable_name, scenario_datasets, scenario_paths, control, v_max=100, v_min=-100):
     
     shapefile_name = "/ocean/rlovindeer/Atlantis/ssam_oceanparcels/SalishSea/SalishSea_July172019_2/SalishSea_July172019.shp"
     map_df = gpd.read_file(shapefile_name)
@@ -888,7 +1013,7 @@ def map_pelagic_aggregate_time(variable_name, scenario_datasets, scenario_labels
 
     position = 0
 
-    for scenario, label in zip(scenario_datasets, scenario_labels):
+    for scenario, label in zip(scenario_datasets, scenario_paths):
         dVar_s = scenario.variables[variable_name]
         dVar_s = dVar_s.sum(axis=2)
         dVar_s = dVar_s.sum(axis=0)
@@ -1116,3 +1241,377 @@ def animate_map_benthic(variable_name, scenario_datasets, scenario_labels, contr
         display(img(anim.read()))
     
     return
+
+def plot_pah(pah, scenario_datasets, scenario_paths, start, end):
+    fig, ax = plt.subplots(figsize = (14,3))
+    names = []
+    for scenario, path in zip(scenario_datasets,scenario_paths):
+        nm = path.parent.stem
+        names.append(nm)
+        contam_tbl = scenario.variables[str(pah)][start:end,:,0:6]
+        contam_tb = contam_tbl.sum(axis=2)
+        contam_t = contam_tb.sum(axis=1)
+        ax.semilogy(scenario.t[start:end], contam_t) 
+    ax.set_title('Concentration of '+ pah +' in water column', fontsize = 12)
+    ax.set_ylabel('mg PAH/m$^3$')
+    ax.legend(names, loc='best');
+
+def boxplot_pelagic_N(group, scenario_datasets,scenario_paths,control,start,end,location=groups.salish_sea, pick=2, x_lim=None): #bacteria, plankton
+    all_results = []
+
+    for scenario, path in zip(scenario_datasets, scenario_paths):
+        nm = str(path.parent.stem).split(sep='_')
+        scenario_name = conditions[str(nm[pick])]
+
+        results = []
+        bio_groups = []
+
+        for species in group:
+            p_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,location,0:6], np.nan)
+            p_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,location,0:6], np.nan)
+            p_oiled = p_oiled.sum(axis=2)
+            p_oiled = p_oiled.sum(axis=1)
+            p_oiled = p_oiled.mean(axis=0)
+            p_control = p_control.sum(axis=2)
+            p_control = p_control.sum(axis=1)
+            p_control = p_control.mean(axis=0)
+            ratio = (p_oiled/p_control-1)*100
+            results.append(ratio)
+            bio_groups.append(species)
+
+        df = pd.DataFrame({
+            'bio_group': bio_groups,
+            'percent_change': results,
+            'scenario': scenario_name
+        })
+        all_results.append(df)
+
+    # Concatenate all scenario results
+    combined_df = pd.concat(all_results)
+    #print(combined_df)
+
+    # Pivot so we have bio_group as index and scenario as columns
+    pivot_df = combined_df.pivot(index='bio_group', columns='scenario', values='percent_change')
+
+    # Plot horizontal bar chart
+    pivot_df.plot(kind='barh', figsize=(10, 6), xlabel='Percent (%) Change relative to control', ylabel='Pelagic Biomass Groups')
+    plt.title('Biomass Change Across Scenarios')
+    plt.axvline(x=0, color='gray', linestyle='--')
+    plt.tight_layout()
+    plt.show()
+
+def boxplot_benthic_N(group, scenario_datasets,scenario_paths,control,start,end,location=groups.salish_sea, pick=2,x_lim=None): #bacteria, plankton
+    all_results = []
+
+    for scenario, path in zip(scenario_datasets, scenario_paths):
+        nm = str(path.parent.stem).split(sep='_')
+        scenario_name = conditions[str(nm[pick])]
+
+        results = []
+        bio_groups = []
+
+        for species in group:
+            p_oiled = np.ma.filled(scenario.variables[group[species] + '_N'][start:end,location], np.nan)
+            p_control = np.ma.filled(control.variables[group[species] + '_N'][start:end,location], np.nan)
+            p_oiled = p_oiled.sum(axis=1)
+            p_oiled = p_oiled.mean(axis=0)
+            p_control = p_control.sum(axis=1)
+            p_control = p_control.mean(axis=0)
+            ratio = (p_oiled/p_control-1)*100
+            results.append(ratio)
+            bio_groups.append(species)
+
+        df = pd.DataFrame({
+            'bio_group': bio_groups,
+            'percent_change': results,
+            'scenario': scenario_name
+        })
+        all_results.append(df)
+
+    # Concatenate all scenario results
+    combined_df = pd.concat(all_results)
+    #print(combined_df)
+
+    # Pivot so we have bio_group as index and scenario as columns
+    pivot_df = combined_df.pivot(index='bio_group', columns='scenario', values='percent_change')
+
+    # Plot horizontal bar chart
+    pivot_df.plot(kind='barh', figsize=(10, 6), xlabel='Percent (%) Change relative to control', ylabel='Benthic Biomass Groups')
+    plt.title('Biomass Change Across Scenarios')
+    plt.axvline(x=0, color='gray', linestyle='--')
+    plt.tight_layout()
+    plt.show()
+
+def boxplot_pelagic_vertebrates(group, scenario_datasets,scenario_paths,control,start,end,location=groups.salish_sea,pick=2,x_lim=None): #bacteria, plankton
+
+    all_results = []
+
+    for scenario, path in zip(scenario_datasets, scenario_paths):
+        nm = str(path.parent.stem).split(sep='_')
+        scenario_name = conditions[str(nm[pick])]
+
+        results = []
+        bio_groups = []
+
+        for species in group:
+            c_numbers_tbl = np.ma.filled(control.variables[group[species] + '3_Nums'][start:end,location,0:6], np.NaN)
+            c_structuralN_tbl = np.ma.filled(control.variables[group[species] +'3_StructN'][start:end,location,0:6], np.NaN)
+            c_reservedN_tbl = np.ma.filled(control.variables[group[species] +'3_ResN'][start:end,location,0:6], np.NaN)
+
+            c_weightatage_tbl = (c_structuralN_tbl + c_reservedN_tbl * c_numbers_tbl) *20*5.7*(3.65/2.65)/1000000
+            c_weightatage_tb = c_weightatage_tbl.sum(axis=2)
+            c_weightatage_t = c_weightatage_tb.sum(axis=1)
+            
+            o_numbers_tbl = np.ma.filled(scenario.variables[group[species] + '3_Nums'][start:end,location,0:6], np.NaN)
+            o_structuralN_tbl = np.ma.filled(scenario.variables[group[species] +'3_StructN'][start:end,location,0:6], np.NaN)
+            o_reservedN_tbl = np.ma.filled(scenario.variables[group[species] +'3_ResN'][start:end,location,0:6], np.NaN)
+
+            o_weightatage_tbl = (o_structuralN_tbl + o_reservedN_tbl * o_numbers_tbl) *20*5.7*(3.65/2.65)/1000000
+            o_weightatage_tb = o_weightatage_tbl.sum(axis=2)
+            o_weightatage_t = o_weightatage_tb.sum(axis=1)
+
+            ratio = (o_weightatage_t.mean()/c_weightatage_t.mean()-1)*100
+            results.append(ratio)
+            bio_groups.append(group[species])
+
+        df = pd.DataFrame({
+            'bio_group': bio_groups,
+            'percent_change': results,
+            'scenario': scenario_name
+        })
+        all_results.append(df)
+
+    # Concatenate all scenario results
+    combined_df = pd.concat(all_results)
+
+    # Pivot so we have bio_group as index and scenario as columns
+    pivot_df = combined_df.pivot(index='bio_group', columns='scenario', values='percent_change')
+
+    # Plot horizontal bar chart
+    pivot_df.plot(kind='barh', figsize=(10, 6), xlabel='Percent (%) Change relative to control', ylabel='Pelagic Vertebrate Groups')
+    plt.title('Biomass Change Across Scenarios')
+    plt.axvline(x=0, color='gray', linestyle='--')
+    plt.tight_layout()
+    plt.show()      
+
+
+def plot_pelagic_biomass(group,scenario_datasets,scenario_paths,control,start,end,location=groups.salish_sea,pick=2,y_min=None, y_max=None): #bacteria, plankton, sharks, birds, mammals, named_fish, salmon, fish, benth_feeders
+
+    fig = plt.figure(figsize=(18, 18), facecolor='white')
+    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
+
+    names = ['control']
+
+    for species in group:
+        
+        bio_index = (list(group).index(species))
+
+        if bio_index < 3:
+            position = 0, bio_index
+        elif bio_index > 5: 
+            position = 2, bio_index-6
+        else :
+            position = 1, bio_index-3
+
+        ax = fig.add_subplot(gs[position])
+
+        pelagic_control = control.variables[group[species] + '_N'][start:end,location,0:6]
+        pelagic_control = pelagic_control.sum(axis=2)
+        pelagic_control = pelagic_control.sum(axis=1)
+        ax.plot(control.t[start:end],  pelagic_control, 'k', linewidth = 2)
+    
+        for scenario, path in zip(scenario_datasets,scenario_paths):
+            nm = str(path.parent.stem).split(sep = '_')
+            names.append(conditions[str(nm[pick])])
+            pelagic_oiled = scenario.variables[group[species] + '_N'][start:end,location,0:6]
+            pelagic_oiled = pelagic_oiled.sum(axis=2) 
+            pelagic_oiled = pelagic_oiled.sum(axis=1) 
+            ax.plot(scenario.t[start:end], pelagic_oiled, linewidth = 2)
+       
+        plt.ylabel('Biomass (mg N m$^{-3}$)', fontsize=12)
+        ax.set_title(species)
+        ax.set_ylim([y_min, y_max])
+    ax.legend(names, bbox_to_anchor=(1.05, 1), fontsize=12); #loc='upper left', )
+
+def plot_benthic_biomass(group,scenario_datasets,scenario_paths,control,start,end,location=groups.salish_sea,pick=2,y_min=None, y_max=None): #bacteria, plankton, sharks, birds, mammals, named_fish, salmon, fish, benth_feeders
+
+    fig = plt.figure(figsize=(18, 18), facecolor='white')
+    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
+
+    names = ['control']
+
+    for species in group:
+        
+        bio_index = (list(group).index(species))
+
+        if bio_index < 3:
+            position = 0, bio_index
+        elif bio_index > 5: 
+            position = 2, bio_index-6
+        else :
+            position = 1, bio_index-3
+
+        ax = fig.add_subplot(gs[position])
+
+        pelagic_control = control.variables[group[species] + '_N'][start:end,location]
+        pelagic_control = pelagic_control.sum(axis=1)
+        ax.plot(control.t[start:end],  pelagic_control, 'k', linewidth = 2)
+    
+        for scenario, path in zip(scenario_datasets,scenario_paths):
+            nm = str(path.parent.stem).split(sep = '_')
+            names.append(conditions[str(nm[pick])])
+            pelagic_oiled = scenario.variables[group[species] + '_N'][start:end,location]
+            pelagic_oiled = pelagic_oiled.sum(axis=1)
+            ax.plot(scenario.t[start:end], pelagic_oiled, linewidth = 2)
+       
+        plt.ylabel('Biomass (mg N m$^{-3}$)', fontsize=12)
+        ax.set_title(species)
+        ax.set_ylim([y_min, y_max])
+    ax.legend(names, bbox_to_anchor=(1.05, 1), fontsize=12); #loc='upper left', )
+
+def plot_numbers(group,scenario_datasets,scenario_paths,control,start,end,location=groups.salish_sea,pick=2,y_min=None, y_max=None): #sharks, birds, mammals, named_fish, salmon, fish, benth_feeders
+
+    fig = plt.figure(figsize=(18, 18), facecolor='white')
+    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
+
+    names = ['control']
+
+    for species in group:
+        
+        bio_index = (list(group).index(species))
+
+        if bio_index < 3:
+            position = 0, bio_index
+        elif bio_index > 5: 
+            position = 2, bio_index-6
+        else :
+            position = 1, bio_index-3
+
+        ax = fig.add_subplot(gs[position])
+
+        pelagic_control = control.variables[group[species] + '3_Nums'][start:end,location,0:6]
+        pelagic_control = pelagic_control.sum(axis=2)
+        pelagic_control = pelagic_control.sum(axis=1)
+        ax.plot(control.t[start:end], pelagic_control, 'k', linewidth = 2)
+    
+        for scenario, path in zip(scenario_datasets,scenario_paths):
+
+            nm = str(path.parent.stem).split(sep = '_')
+            names.append(conditions[str(nm[pick])])
+            pelagic_oiled = scenario.variables[group[species] + '3_Nums'][start:end,location,0:6]
+            pelagic_oiled = pelagic_oiled.sum(axis=2) 
+            pelagic_oiled = pelagic_oiled.sum(axis=1) 
+            ax.plot(scenario.t[start:end], pelagic_oiled, linewidth = 2)
+       
+        plt.ylabel('Numbers of cohort 3', fontsize=12)
+        ax.set_title(species)
+        ax.set_ylim([y_min, y_max])
+    ax.legend(names, bbox_to_anchor=(1.05, 1), fontsize=12); #loc='upper left', )
+
+def plot_weight(group,scenario_datasets,scenario_paths,control,start,end,location=groups.salish_sea,pick=2,y_min=None, y_max=None): #bacteria, plankton, sharks, birds, mammals, named_fish, salmon, fish, benth_feeders
+
+    fig = plt.figure(figsize=(18, 18), facecolor='white')
+    gs = plt.GridSpec(3, 3, wspace=0.2, hspace=0.2, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1])
+
+    names = ['control']
+
+    for species in group:
+        
+        bio_index = (list(group).index(species))
+
+        if bio_index < 3:
+            position = 0, bio_index
+        elif bio_index > 5: 
+            position = 2, bio_index-6
+        else :
+            position = 1, bio_index-3
+
+        ax = fig.add_subplot(gs[position])
+
+        c_numbers_tbl = np.ma.filled(control.variables[group[species] + '3_Nums'][start:end,location,0:6], np.NaN)
+        c_structuralN_tbl = np.ma.filled(control.variables[group[species] +'3_StructN'][start:end,location,0:6], np.NaN)
+        c_reservedN_tbl = np.ma.filled(control.variables[group[species] +'3_ResN'][start:end,location,0:6], np.NaN)
+
+        c_weightatage_tbl = (c_structuralN_tbl + c_reservedN_tbl * c_numbers_tbl) *20*5.7*(3.65/2.65)/1000000
+        c_weightatage_tb = c_weightatage_tbl.sum(axis=2)
+        c_weightatage_t = c_weightatage_tb.sum(axis=1)
+        ax.plot(control.t[start:end], c_weightatage_t, 'k', linewidth = 2)
+        
+        for scenario, path in zip(scenario_datasets,scenario_paths):
+
+            nm = str(path.parent.stem).split(sep = '_')
+            names.append(conditions[str(nm[pick])])
+            
+            o_numbers_tbl = np.ma.filled(scenario.variables[group[species] + '3_Nums'][start:end,location,0:6], np.NaN)
+            o_structuralN_tbl = np.ma.filled(scenario.variables[group[species] +'3_StructN'][start:end,location,0:6], np.NaN)
+            o_reservedN_tbl = np.ma.filled(scenario.variables[group[species] +'3_ResN'][start:end,location,0:6], np.NaN)
+
+            o_weightatage_tbl = (o_structuralN_tbl + o_reservedN_tbl * o_numbers_tbl) *20*5.7*(3.65/2.65)/1000000
+            o_weightatage_tb = o_weightatage_tbl.sum(axis=2)
+            o_weightatage_t = o_weightatage_tb.sum(axis=1)
+            ax.plot(scenario.t[start:end], o_weightatage_t, linewidth = 2)
+       
+        ax.set_title(species)
+        ax.set_ylim([y_min, y_max])
+        plt.ylabel('Weight of cohort 3', fontsize=12)
+    ax.legend(names, bbox_to_anchor=(1.05, 1), fontsize=12); #loc='upper left', )
+
+def plot_radar_vertebrates(bio_group, scenario_datasets,scenario_paths,control,start,end,location=groups.salish_sea,pick=2,min=-5, max=0):
+    label_size = 11
+    font_size = 12
+    line_width = 2
+
+    fig, ax = plt.subplots(figsize=(10, 10), subplot_kw=dict(polar=True))
+
+    names = []
+    for scenario, path in zip(scenario_datasets,scenario_paths):
+        biomass_change = []
+        for species in bio_group:
+            new_species = bio_group[species]
+            nm = str(path.parent.stem).split(sep = '_')
+            names.append(conditions[str(nm[pick])])
+            
+            c_numbers_tbl = control.variables[new_species + '3_Nums'][start:end,location,:]
+            c_structuralN_tbl = control.variables[new_species +'3_StructN'][start:end,location,:]
+            c_reservedN_tbl = control.variables[new_species +'3_ResN'][start:end,location,:]
+
+            c_weightatage_tbl = (c_structuralN_tbl + c_reservedN_tbl * c_numbers_tbl) *20*5.7*(3.65/2.65)/1000000
+            c_weightatage_tb = c_weightatage_tbl.sum(axis=2)
+            c_weightatage_t = c_weightatage_tb.sum(axis=1)
+            
+            o_numbers_tbl = scenario.variables[new_species + '3_Nums'][start:end,location,:]
+            o_structuralN_tbl = scenario.variables[new_species +'3_StructN'][start:end,location,:]
+            o_reservedN_tbl = scenario.variables[new_species +'3_ResN'][start:end,location,:]
+
+            o_weightatage_tbl = (o_structuralN_tbl + o_reservedN_tbl * o_numbers_tbl) *20*5.7*(3.65/2.65)/1000000
+            o_weightatage_tb = o_weightatage_tbl.sum(axis=2)
+            o_weightatage_t = o_weightatage_tb.sum(axis=1)
+
+            biomass_change.append((o_weightatage_t.mean()/c_weightatage_t.mean()-1)*100)
+        biomass_change += biomass_change[:1]
+
+        data_values = {nm[pick]:biomass_change}
+        num_vars = len(bio_group)
+        angles = np.linspace(0, 2 * np.pi, num_vars, endpoint=False).tolist()
+        angles += angles[:1]
+        
+        for item in data_values:
+            ax.plot(angles, data_values[item], linewidth=line_width, label=item)
+        
+        ax.set_theta_offset(np.pi / 2)
+        ax.set_theta_direction(-1)
+        ax.set_rlabel_position(180 / num_vars)
+        ax.set_ylim(min, max)
+        ax.tick_params(axis='y', labelsize=font_size)
+        ax.set_xticks(angles[:-1])
+        ax.set_xticklabels(bio_group)
+        ax.tick_params(axis='x', labelsize=font_size)
+        for label, angle in zip(ax.get_xticklabels(), angles):
+            if angle in (0, np.pi):
+                label.set_horizontalalignment('center')
+            elif 0 < angle < np.pi:
+                label.set_horizontalalignment('left')
+            else:
+                label.set_horizontalalignment('right')
+    ax.plot(angles, np.zeros(num_vars+1), 'k--',linewidth=line_width, label='Control, no spill')
+    ax.legend(loc='upper right', bbox_to_anchor=(1.3, 1.1), fontsize=font_size);
