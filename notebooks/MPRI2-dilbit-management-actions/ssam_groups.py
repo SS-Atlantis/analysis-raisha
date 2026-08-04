@@ -249,18 +249,19 @@ base_biomass = {'Pelag_Bact':10000,'PicoPhytopl': 10000, 'Diatom':10000,'MicroZo
 }
 
 scenarios = {  
-    0:'no_PAH', 
-    1:'free_PAH',
-    2:'30d_closure',
-    3:'60d_closure',
-    4:'48h_contain',
-    5:'48h_contain_30d_closure',
-    6:'48h_conatin_90d_closure',
+    '0':'no_PAH_30_closure', 
+    '0.5':'no_PAH_90_closure',
+    '1':'free_PAH',
+    '2':'30d_closure',
+    '3':'90d_closure',
+    '4':'48h_contain',
+    '5':'48h_contain_30d_closure',
+    '6':'48h_contain_90d_closure',
 }
 
 conditions = {
-    '2019-01-20':'WD_S', '2019-04-12':'CD_strong_N',
-    '2020-01-24':'WD_N', '2020-04-11':'CD_medium_S', 
-    '2019-10-20':'WD_N_currents_S', '2019-07-03':'FRD_low',
-    '2020-10-20':'CD_strong_S', '2020-07-05':'FRD_high'
+    '2019-01-20':'winter_S_winds', '2019-04-12':'spring_opposing_winds_currents',
+    '2020-01-24':'winter_N_winds', '2020-04-11':'spring_tandem_winds_currents', 
+    '2019-10-20':'fall_strong_N_winds', '2019-07-03':'summer_Fraser_strong_winds',
+    '2020-10-20':'fall_weak_winds', '2020-07-05':'summer_Fraser_weak_winds'
 }
