@@ -33,6 +33,24 @@ named_fish = {
     'rockfish':'Rockfish', 'pacific herring':'Pacific_herring',
 }
 
+large_pelagic_fish = {
+    'hake':'Hake','lingcod':'Lingcod', 'pollock':'Pollock','rockfish':'Rockfish', 
+}
+
+small_pelagic_fish = {
+    'small pelagic':'Small_pelagic_fish', 'sandlance':'Sandlance', 
+    'rockfish':'Rockfish', 'pacific herring':'Pacific_herring',
+}
+
+small_demersal_fish = {
+    'benthopelagic':'Benthopelagic','small demersal':'Small_Demersal_fish', 
+    'small flatfish':'Small_Flatfish', 
+}
+
+large_demersal_fish = {
+    'large demersal':'Large_Demersal_fish', 'large flatfish':'Large_Flatfish',
+}
+
 salmon = {
     'Chinook':'Chinook_salmon', 'Chum':'Chum_salmon', 'Coho':'Coho_salmon','Pink':'Pink_salmon', 'Sockeye':'Sockeye_salmon', 
     'Hatchery Chinook':'Hatchery_Chinook_salmon','Hatchery Coho':'Hatchery_Coho_salmon','Hatchery Sockeye':'Hatchery_Sockeye_salmon',
@@ -53,7 +71,12 @@ benthic_invertebrates = { #benthic, 1 depth
     'sponges':'Sponges', 'bivalves':'Bivalves', 'crabs':'Crabs', 'dungeness crabs':'Dungeness_crabs',
 }
 
-macroalgae = { #benthic, 1 depth
+benthic_invertebrates_without_shellfish = { #benthic, 1 depth
+    'benthic grazers':'Benthic_grazer', 'other filter feeders': 'Filter_feeder', 'macrobenthos':'Macrobenthos',  
+    'sponges':'Sponges', 
+}
+
+vegetation = { #benthic, 1 depth
     'macroalgae':'Macroalgae', 'seagrass':'Seagrass', 
 }
 
@@ -67,7 +90,7 @@ shellfish = { #benthic, 1 depth
 
 plankton = {
     'carnivorous zooplankton':'Carniv_Zoo', 'gelatinous zooplantkon':'Gelat_Zoo', 'microzooplankton':'MicroZoo',
-    'mesozooplankton':'Zoo', 'diatoms':'Diatom', 'picophytoplankton':'PicoPhytopl', 'pelagic bacteria':'Pelag_Bact',
+    'mesozooplankton':'Zoo', 'diatoms':'Diatom', 'picophytoplankton':'PicoPhytopl',
 }
 
 pelagic_invertebrates = {
@@ -249,14 +272,17 @@ base_biomass = {'Pelag_Bact':10000,'PicoPhytopl': 10000, 'Diatom':10000,'MicroZo
 }
 
 scenarios = {  
-    '0':'no_PAH_30_closure', 
-    '0.5':'no_PAH_90_closure',
+    '030':'no_PAH_30d_closure', 
+    '090':'no_PAH_90d_closure',
     '1':'free_PAH',
     '2':'30d_closure',
     '3':'90d_closure',
     '4':'48h_contain',
     '5':'48h_contain_30d_closure',
     '6':'48h_contain_90d_closure',
+    '7':'180d_closure',
+    '8':'270d_closure',
+    '9':'365d_closure',
 }
 
 conditions = {
